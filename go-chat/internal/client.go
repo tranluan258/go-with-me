@@ -2,12 +2,16 @@ package internal
 
 import "github.com/gorilla/websocket"
 
+type message struct {
+	msg    []byte
+	sender int
+}
+
 type client struct {
-	socket *websocket.Conn
-
-	send chan []byte
-
-	room *room
+	socket   *websocket.Conn
+	send     chan message
+	room     *room
+	clientId int
 }
 
 func (c *client) read() {
@@ -19,15 +23,20 @@ func (c *client) read() {
 			return
 		}
 
-		c.room.forward <- msg
+		message := message{
+			msg:    msg,
+			sender: c.clientId,
+		}
+
+		c.room.forward <- message
 	}
 }
 
 func (c *client) write() {
 	defer c.socket.Close()
 
-	for msg := range c.send {
-		err := c.socket.WriteMessage(websocket.TextMessage, msg)
+	for message := range c.send {
+		err := c.socket.WriteMessage(websocket.TextMessage, message.msg)
 		if err != nil {
 			return
 		}

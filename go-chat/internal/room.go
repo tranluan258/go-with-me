@@ -7,8 +7,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var doomId int = 1
+
 type room struct {
-	forward chan []byte
+	forward chan message
 
 	join chan *client
 
@@ -19,7 +21,7 @@ type room struct {
 
 func newRoom() *room {
 	return &room{
-		forward: make(chan []byte),
+		forward: make(chan message),
 		join:    make(chan *client),
 		leave:   make(chan *client),
 		clients: make(map[*client]bool),
@@ -31,14 +33,16 @@ func (r *room) run() {
 		select {
 		case client := <-r.join:
 			r.clients[client] = true
-			log.Println("new client")
+			log.Println("new client", client.clientId)
 		case client := <-r.leave:
 			delete(r.clients, client)
 			log.Println("client left")
 		case msg := <-r.forward:
 			for client := range r.clients {
-				client.send <- msg
-				log.Println("new message")
+				if msg.sender != client.clientId {
+					log.Println("new message")
+					client.send <- msg
+				}
 			}
 		}
 	}
@@ -57,11 +61,13 @@ func (r *room) Serve(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		return
 	}
+	doomId = doomId + 1
 
 	client := &client{
-		socket: socket,
-		send:   make(chan []byte),
-		room:   r,
+		clientId: doomId,
+		socket:   socket,
+		send:     make(chan message),
+		room:     r,
 	}
 	r.join <- client
 
