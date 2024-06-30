@@ -24,16 +24,14 @@ func (c *client) read() {
 	defer c.socket.Close()
 
 	for {
+		var message message
 		_, msg, err := c.socket.ReadMessage()
 		if err != nil {
 			return
 		}
-
-		message := message{
-			Msg:      string(msg),
-			Username: c.username,
-			Sender:   c.clientId,
-		}
+		json.Unmarshal(msg, &message)
+		message.Sender = c.clientId
+		message.Username = c.username
 
 		c.room.forward <- message
 	}

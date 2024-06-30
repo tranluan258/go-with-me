@@ -54,7 +54,11 @@ function handleSendMessage() {
     return;
   }
   createMessageElement(msg.value, false);
-  conn.send(msg.value);
+  conn.send(
+    JSON.stringify({
+      msg: msg.value,
+    }),
+  );
 
   msg.value = "";
 }
