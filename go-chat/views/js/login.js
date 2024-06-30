@@ -1,3 +1,6 @@
+/**
+ * @description handle login
+ */
 function handleLogin() {
   const username = document.getElementById("username");
   const password = document.getElementById("password");
@@ -19,7 +22,7 @@ function handleLogin() {
     .then(() => {
       window.location = "/";
     })
-    .catch((err) => {
-      alert(err);
+    .catch(() => {
+      alert("Something wroing here!");
     });
 }

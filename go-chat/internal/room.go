@@ -10,11 +10,8 @@ import (
 
 type room struct {
 	forward chan message
-
-	join chan *client
-
-	leave chan *client
-
+	join    chan *client
+	leave   chan *client
 	clients map[*client]bool
 }
 
@@ -37,9 +34,9 @@ func (r *room) run() {
 			delete(r.clients, client)
 			log.Println("client left")
 		case msg := <-r.forward:
-			log.Println("new message from ", msg.username)
+			log.Println("new message from ", msg.Username)
 			for client := range r.clients {
-				if msg.sender != client.clientId {
+				if msg.Sender != client.clientId {
 					client.send <- msg
 				}
 			}

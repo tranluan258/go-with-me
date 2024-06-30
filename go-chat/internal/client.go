@@ -1,11 +1,15 @@
 package internal
 
-import "github.com/gorilla/websocket"
+import (
+	"encoding/json"
+
+	"github.com/gorilla/websocket"
+)
 
 type message struct {
-	sender   string
-	username string
-	msg      []byte
+	Sender   string `json:"sender"`
+	Username string `json:"username"`
+	Msg      string `json:"msg"`
 }
 
 type client struct {
@@ -26,9 +30,9 @@ func (c *client) read() {
 		}
 
 		message := message{
-			msg:      msg,
-			username: c.username,
-			sender:   c.clientId,
+			Msg:      string(msg),
+			Username: c.username,
+			Sender:   c.clientId,
 		}
 
 		c.room.forward <- message
@@ -39,7 +43,8 @@ func (c *client) write() {
 	defer c.socket.Close()
 
 	for message := range c.send {
-		err := c.socket.WriteMessage(websocket.TextMessage, message.msg)
+		data, _ := json.Marshal(message)
+		err := c.socket.WriteMessage(websocket.TextMessage, data)
 		if err != nil {
 			return
 		}
