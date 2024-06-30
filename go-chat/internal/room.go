@@ -2,12 +2,11 @@ package internal
 
 import (
 	"log"
+	"math/rand"
 	"net/http"
 
 	"github.com/gorilla/websocket"
 )
-
-var doomId int = 1
 
 type room struct {
 	forward chan message
@@ -38,9 +37,9 @@ func (r *room) run() {
 			delete(r.clients, client)
 			log.Println("client left")
 		case msg := <-r.forward:
+			log.Println("new message from ", msg.username)
 			for client := range r.clients {
 				if msg.sender != client.clientId {
-					log.Println("new message")
 					client.send <- msg
 				}
 			}
@@ -57,14 +56,17 @@ var upgrader = &websocket.Upgrader{ReadBufferSize: socketBufferSize, WriteBuffer
 
 func (r *room) Serve(w http.ResponseWriter, req *http.Request) {
 	// connect to ws
+	cookie, _ := req.Cookie("username")
 	socket, err := upgrader.Upgrade(w, req, nil)
 	if err != nil {
 		return
 	}
-	doomId = doomId + 1
+
+	clientId := randomId(10)
 
 	client := &client{
-		clientId: doomId,
+		clientId: clientId,
+		username: cookie.Value,
 		socket:   socket,
 		send:     make(chan message),
 		room:     r,
@@ -75,4 +77,14 @@ func (r *room) Serve(w http.ResponseWriter, req *http.Request) {
 
 	go client.write()
 	client.read()
+}
+
+func randomId(length int) string {
+	digits := "123456789abcefghjklmnbvcxz"
+	res := ""
+
+	for range length {
+		res += string(digits[rand.Intn(len(digits))])
+	}
+	return res
 }

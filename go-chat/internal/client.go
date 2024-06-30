@@ -3,15 +3,17 @@ package internal
 import "github.com/gorilla/websocket"
 
 type message struct {
-	msg    []byte
-	sender int
+	sender   string
+	username string
+	msg      []byte
 }
 
 type client struct {
 	socket   *websocket.Conn
 	send     chan message
 	room     *room
-	clientId int
+	clientId string
+	username string
 }
 
 func (c *client) read() {
@@ -24,8 +26,9 @@ func (c *client) read() {
 		}
 
 		message := message{
-			msg:    msg,
-			sender: c.clientId,
+			msg:      msg,
+			username: c.username,
+			sender:   c.clientId,
 		}
 
 		c.room.forward <- message
