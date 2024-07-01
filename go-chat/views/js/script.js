@@ -71,9 +71,15 @@ if (window["WebSocket"]) {
    */
   conn.onmessage = function (evt) {
     /**
-     * @type {{username: string; msg: string}}
+     * @type {{username: string; msg: string,type?:string}}
      */
     const data = JSON.parse(evt.data);
+
+    if (data?.type === "notification") {
+      showToast(data.msg);
+      return;
+    }
+
     createMessageElement(data.msg, true, data.username);
   };
 }
@@ -85,3 +91,19 @@ document
       document.getElementById("send-button").click();
     }
   });
+
+/**
+ * @param {string} message
+ */
+function showToast(message) {
+  const toastContainer = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000); // Toast duration
+}

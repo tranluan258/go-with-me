@@ -29,12 +29,6 @@ func Init() {
 
 	room := newRoom()
 	e.GET("/", func(ctx echo.Context) error {
-		cookie, _ := ctx.Cookie("username")
-
-		if cookie == nil {
-			return ctx.Redirect(http.StatusMovedPermanently, "/login")
-		}
-
 		return ctx.Render(200, "index.html", nil)
 	})
 	e.GET("/ws", func(ctx echo.Context) error {
@@ -46,8 +40,8 @@ func Init() {
 		return nil
 	})
 	e.GET("/login", func(ctx echo.Context) error {
-		cookie, _ := ctx.Cookie("username")
-		if cookie != nil {
+		_, err := ctx.Cookie("username")
+		if err == nil {
 			return ctx.Redirect(http.StatusMovedPermanently, "/")
 		}
 		return ctx.Render(200, "login.html", nil)

@@ -10,6 +10,7 @@ type message struct {
 	Sender   string `json:"sender"`
 	Username string `json:"username"`
 	Msg      string `json:"msg"`
+	Type     string `json:"type"`
 }
 
 type client struct {
