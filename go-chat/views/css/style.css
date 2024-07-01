@@ -138,9 +138,19 @@ body {
   z-index: 1000;
 }
 
-.toast {
+.toast-joined {
   background: #323232;
-  color: white;
+  color: green;
+  padding: 10px 20px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  opacity: 0;
+  animation: fadeInOut 3s forwards;
+}
+
+.toast-left {
+  background: #323232;
+  color: red;
   padding: 10px 20px;
   border-radius: 5px;
   margin-bottom: 10px;

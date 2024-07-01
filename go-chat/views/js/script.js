@@ -75,8 +75,8 @@ if (window["WebSocket"]) {
      */
     const data = JSON.parse(evt.data);
 
-    if (data?.type === "notification") {
-      showToast(data.msg);
+    if (data?.type?.length > 0) {
+      showToast(data.msg, data.type);
       return;
     }
 
@@ -94,11 +94,12 @@ document
 
 /**
  * @param {string} message
+ * @param {'left'| 'joined'} event
  */
-function showToast(message) {
+function showToast(message, event) {
   const toastContainer = document.getElementById("toastContainer");
   const toast = document.createElement("div");
-  toast.className = "toast";
+  toast.className = event === "left" ? "toast-left" : "toast-joined";
   toast.textContent = message;
 
   toastContainer.appendChild(toast);
