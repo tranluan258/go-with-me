@@ -24,11 +24,16 @@ func Init() {
 	}
 
 	e := echo.New()
+
 	e.Static("/", "views")
 	e.Renderer = t
 
 	room := newRoom()
 	e.GET("/", func(ctx echo.Context) error {
+		_, err := ctx.Cookie("username")
+		if err != nil {
+			return ctx.Redirect(http.StatusSeeOther, "/login")
+		}
 		return ctx.Render(200, "index.html", nil)
 	})
 	e.GET("/ws", func(ctx echo.Context) error {
@@ -42,7 +47,7 @@ func Init() {
 	e.GET("/login", func(ctx echo.Context) error {
 		_, err := ctx.Cookie("username")
 		if err == nil {
-			return ctx.Redirect(http.StatusMovedPermanently, "/")
+			return ctx.Redirect(http.StatusSeeOther, "/login")
 		}
 		return ctx.Render(200, "login.html", nil)
 	})
@@ -59,7 +64,7 @@ func Init() {
 		cookie.Expires = time.Now().Add(24 * time.Hour)
 		cookie.HttpOnly = true
 		ctx.SetCookie(cookie)
-		return ctx.String(http.StatusOK, "ok")
+		return ctx.String(200, "ok")
 	})
 	go room.run()
 

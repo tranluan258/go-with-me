@@ -4,6 +4,11 @@
 var conn;
 
 /**
+ * @type {Array<string>}
+ */
+var users = [];
+
+/**
  * @param {HTMLElement} item
  * @description Append messageElement to chatContainer
  */
@@ -75,12 +80,19 @@ if (window["WebSocket"]) {
      */
     const data = JSON.parse(evt.data);
 
-    if (data?.type?.length > 0) {
-      showToast(data.msg, data.type);
-      return;
+    switch (data?.type) {
+      case "joined":
+        addUserToList(data.username);
+        return;
+      case "left":
+        removeUserFromList(data.username);
+        return;
+      case "user-list":
+        addUserToList(data.username, false);
+        return;
+      default:
+        createMessageElement(data.msg, true, data.username);
     }
-
-    createMessageElement(data.msg, true, data.username);
   };
 }
 
@@ -107,4 +119,31 @@ function showToast(message, event) {
   setTimeout(() => {
     toast.remove();
   }, 3000); // Toast duration
+}
+
+/**
+ * @param {string} username
+ * @param {boolean} [isShow]
+ */
+function addUserToList(username, isShow) {
+  const userListContainer = document.getElementById("userListContainer");
+  const userItem = document.createElement("li");
+  userItem.id = `user-${username}`;
+  userItem.textContent = username;
+  userListContainer.appendChild(userItem);
+
+  if (isShow) {
+    showToast(`${username} has joined the chat!`, "joined");
+  }
+}
+
+/**
+ * @param {string} username
+ */
+function removeUserFromList(username) {
+  const userItem = document.getElementById(`user-${username}`);
+  if (userItem) {
+    userItem.remove();
+    showToast(`${username} has left the chat!`, "left");
+  }
 }

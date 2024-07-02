@@ -29,6 +29,7 @@ func (r *room) run() {
 		select {
 		case client := <-r.join:
 			r.sendJoinedOrLeft(client, "joined")
+			r.sendCurrUserForNewUser(client)
 			r.clients[client] = true
 			log.Println("new client", client.clientId)
 		case client := <-r.leave:
@@ -55,6 +56,17 @@ func (r *room) sendJoinedOrLeft(client *client, event string) {
 	}
 	for client := range r.clients {
 		client.send <- msg
+	}
+}
+
+func (r *room) sendCurrUserForNewUser(newClient *client) {
+	for client := range r.clients {
+		msg := message{
+			Sender:   client.clientId,
+			Username: client.username,
+			Type:     "user-list",
+		}
+		newClient.send <- msg
 	}
 }
 

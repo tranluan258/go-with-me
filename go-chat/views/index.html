@@ -6,18 +6,30 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <div class="chat-container">
-      <div class="chat-header">
-        <h1>Chat App</h1>
+    <div class="chat-app">
+      <div class="user-list" id="userList">
+        <h3>Users in Room</h3>
+        <ul id="userListContainer">
+          <!-- Usernames will be added here dynamically -->
+        </ul>
       </div>
-      <div class="chat-messages" id="container">
-        <!-- Messages will be displayed here -->
+      <div class="chat-container">
+        <div class="chat-header">
+          <h1>Chat App</h1>
+        </div>
+        <div class="chat-messages" id="container">
+          <!-- Messages will be displayed here -->
+        </div>
+        <div class="chat-input">
+          <input
+            type="text"
+            id="message-input"
+            placeholder="Type a message..."
+          />
+          <button id="send-button" onclick="handleSendMessage()">Send</button>
+        </div>
       </div>
-      <div class="chat-input">
-        <input type="text" id="message-input" placeholder="Type a message..." />
-        <button id="send-button" onclick="handleSendMessage()">Send</button>
-      </div>
+      <div id="toastContainer"></div>
     </div>
-    <div id="toastContainer"></div>
   </body>
 </html>
