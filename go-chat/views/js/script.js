@@ -147,3 +147,23 @@ function removeUserFromList(username) {
     showToast(`${username} has left the chat!`, "left");
   }
 }
+
+function toggleEmojiPicker() {
+  const existPicket = document.querySelector(".emoji-picker");
+  if (existPicket) {
+    existPicket.remove();
+  } else {
+    const pickerOptions = { onEmojiSelect: selectEmoji };
+    const picker = new EmojiMart.Picker(pickerOptions);
+    picker.className = "emoji-picker";
+
+    const chatApp = document.querySelector(".chat-input");
+    chatApp.appendChild(picker);
+  }
+}
+
+function selectEmoji(data) {
+  console.log(data);
+  const messageInput = document.getElementById("message-input");
+  messageInput.value += data.native;
+}

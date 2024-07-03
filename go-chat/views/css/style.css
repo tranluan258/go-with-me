@@ -117,6 +117,7 @@ body {
   border-top: 1px solid #ddd;
   padding: 10px;
   background: #fff;
+  position: relative;
 }
 
 .chat-input input {
@@ -199,4 +200,11 @@ body {
   100% {
     opacity: 0;
   }
+}
+
+.emoji-picker {
+  position: absolute;
+  bottom: 60px;
+  right: 20px;
+  z-index: 1000;
 }
