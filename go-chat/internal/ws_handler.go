@@ -33,7 +33,7 @@ func (ws *WsHandler) Serve(c echo.Context) {
 	if ws.rooms[roomId] == nil {
 		room = newRoom(roomId)
 		ws.rooms[roomId] = room
-		go room.run()
+		go room.run() // NOTE: run room one times
 	} else {
 		room = ws.rooms[roomId]
 	}
