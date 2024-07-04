@@ -28,7 +28,8 @@ func Init() {
 	e.Static("/", "views")
 	e.Renderer = t
 
-	room := newRoom()
+	wsHanlder := NewWsHandler()
+
 	e.GET("/", func(ctx echo.Context) error {
 		_, err := ctx.Cookie("username")
 		if err != nil {
@@ -36,12 +37,12 @@ func Init() {
 		}
 		return ctx.Render(200, "index.html", nil)
 	})
-	e.GET("/ws", func(ctx echo.Context) error {
+	e.GET("/ws/:id", func(ctx echo.Context) error {
 		cookie, _ := ctx.Cookie("username")
 		if cookie == nil {
 			return nil
 		}
-		room.Serve(ctx.Response().Writer, ctx.Request())
+		wsHanlder.Serve(ctx)
 		return nil
 	})
 	e.GET("/login", func(ctx echo.Context) error {
@@ -66,7 +67,6 @@ func Init() {
 		ctx.SetCookie(cookie)
 		return ctx.String(200, "ok")
 	})
-	go room.run()
 
 	e.Logger.Fatal(e.Start("localhost:8080"))
 }

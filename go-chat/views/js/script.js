@@ -68,7 +68,7 @@ function handleSendMessage() {
   msg.value = "";
 }
 if (window["WebSocket"]) {
-  const url = "ws://localhost:8080/ws";
+  const url = "ws://localhost:8080/ws/1";
   conn = new WebSocket(url);
 
   /**

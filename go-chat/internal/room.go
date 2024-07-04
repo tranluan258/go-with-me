@@ -3,7 +3,6 @@ package internal
 import (
 	"log"
 	"math/rand"
-	"net/http"
 
 	"github.com/gorilla/websocket"
 )
@@ -13,14 +12,16 @@ type room struct {
 	join    chan *client
 	leave   chan *client
 	clients map[*client]bool
+	roomId  string
 }
 
-func newRoom() *room {
+func newRoom(roomId string) *room {
 	return &room{
 		forward: make(chan message),
 		join:    make(chan *client),
 		leave:   make(chan *client),
 		clients: make(map[*client]bool),
+		roomId:  roomId,
 	}
 }
 
@@ -31,7 +32,7 @@ func (r *room) run() {
 			r.sendJoinedOrLeft(client, "joined")
 			r.sendCurrUserForNewUser(client)
 			r.clients[client] = true
-			log.Println("new client", client.clientId)
+			log.Println("new client", client.clientId, r.roomId)
 		case client := <-r.leave:
 			delete(r.clients, client)
 			r.sendJoinedOrLeft(client, "left")
@@ -76,31 +77,6 @@ const (
 )
 
 var upgrader = &websocket.Upgrader{ReadBufferSize: socketBufferSize, WriteBufferSize: messageBufferSize}
-
-func (r *room) Serve(w http.ResponseWriter, req *http.Request) {
-	// connect to ws
-	cookie, _ := req.Cookie("username")
-	socket, err := upgrader.Upgrade(w, req, nil)
-	if err != nil {
-		return
-	}
-
-	clientId := randomId(10)
-
-	client := &client{
-		clientId: clientId,
-		username: cookie.Value,
-		socket:   socket,
-		send:     make(chan message),
-		room:     r,
-	}
-	r.join <- client
-
-	defer func() { r.leave <- client }()
-
-	go client.write()
-	client.read()
-}
 
 func randomId(length int) string {
 	digits := "123456789abcefghjklmnbvcxz"
