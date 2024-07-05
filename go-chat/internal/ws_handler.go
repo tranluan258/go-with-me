@@ -14,18 +14,16 @@ func NewWsHandler() *WsHandler {
 	}
 }
 
-func (ws *WsHandler) Serve(c echo.Context) {
-	// connect to ws
+func (ws *WsHandler) Serve(c echo.Context) error {
 	cookie, _ := c.Cookie("username")
 	socket, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		return
+		return err
 	}
 
 	roomId := c.Param("id")
-
 	if roomId == "" {
-		return
+		return err
 	}
 
 	var room *room
@@ -53,4 +51,6 @@ func (ws *WsHandler) Serve(c echo.Context) {
 
 	go client.write()
 	client.read()
+
+	return nil
 }

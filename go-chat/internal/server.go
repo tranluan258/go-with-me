@@ -30,21 +30,18 @@ func Init() {
 
 	wsHanlder := NewWsHandler()
 
-	e.GET("/", func(ctx echo.Context) error {
-		_, err := ctx.Cookie("username")
+	e.GET("/", MustAuth(func(ctx echo.Context) error {
+		return ctx.Render(http.StatusOK, "index.html", nil)
+	}))
+
+	e.GET("/ws/:id", MustAuth(func(ctx echo.Context) error {
+		err := wsHanlder.Serve(ctx)
 		if err != nil {
-			return ctx.Redirect(http.StatusSeeOther, "/login")
+			return ctx.String(http.StatusInternalServerError, "server error")
 		}
-		return ctx.Render(200, "index.html", nil)
-	})
-	e.GET("/ws/:id", func(ctx echo.Context) error {
-		cookie, _ := ctx.Cookie("username")
-		if cookie == nil {
-			return nil
-		}
-		wsHanlder.Serve(ctx)
 		return nil
-	})
+	}))
+
 	e.GET("/login", func(ctx echo.Context) error {
 		_, err := ctx.Cookie("username")
 		if err == nil {
@@ -52,6 +49,7 @@ func Init() {
 		}
 		return ctx.Render(200, "login.html", nil)
 	})
+
 	e.POST("/login", func(ctx echo.Context) error {
 		var user models.User
 
