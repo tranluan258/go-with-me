@@ -19,8 +19,12 @@ function handleLogin() {
       password: password.value,
     }),
   })
-    .then(() => {
-      window.location = "/";
+    .then((data) => {
+      if (data.status >= 400) {
+        alert("Username or password invalid");
+      } else {
+        window.location = "/";
+      }
     })
     .catch(() => {
       alert("Something wroing here!");

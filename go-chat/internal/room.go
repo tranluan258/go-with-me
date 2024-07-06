@@ -2,7 +2,6 @@ package internal
 
 import (
 	"log"
-	"math/rand"
 
 	"github.com/gorilla/websocket"
 )
@@ -51,8 +50,8 @@ func (r *room) run() {
 func (r *room) sendJoinedOrLeft(client *client, event string) {
 	msg := message{
 		Sender:   client.clientId,
-		Username: client.username,
-		Msg:      client.username + " " + event,
+		Username: client.fullName,
+		Msg:      client.fullName + " " + event,
 		Type:     event,
 	}
 	for client := range r.clients {
@@ -64,7 +63,7 @@ func (r *room) sendCurrUserForNewUser(newClient *client) {
 	for client := range r.clients {
 		msg := message{
 			Sender:   client.clientId,
-			Username: client.username,
+			Username: client.fullName,
 			Type:     "user-list",
 		}
 		newClient.send <- msg
@@ -77,13 +76,3 @@ const (
 )
 
 var upgrader = &websocket.Upgrader{ReadBufferSize: socketBufferSize, WriteBufferSize: messageBufferSize}
-
-func randomId(length int) string {
-	digits := "123456789abcefghjklmnbvcxz"
-	res := ""
-
-	for range length {
-		res += string(digits[rand.Intn(len(digits))])
-	}
-	return res
-}

@@ -18,7 +18,7 @@ type client struct {
 	send     chan message
 	room     *room
 	clientId string
-	username string
+	fullName string
 }
 
 func (c *client) read() {
@@ -32,7 +32,7 @@ func (c *client) read() {
 		}
 		json.Unmarshal(msg, &message)
 		message.Sender = c.clientId
-		message.Username = c.username
+		message.Username = c.fullName
 
 		c.room.forward <- message
 	}

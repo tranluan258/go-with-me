@@ -15,7 +15,8 @@ func NewWsHandler() *WsHandler {
 }
 
 func (ws *WsHandler) Serve(c echo.Context) error {
-	cookie, _ := c.Cookie("username")
+	fullName, _ := c.Cookie("full_name")
+	clientId, _ := c.Cookie("user_id")
 	socket, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return err
@@ -36,11 +37,9 @@ func (ws *WsHandler) Serve(c echo.Context) error {
 		room = ws.rooms[roomId]
 	}
 
-	clientId := randomId(10)
-
 	client := &client{
-		clientId: clientId,
-		username: cookie.Value,
+		clientId: clientId.Value,
+		fullName: fullName.Value,
 		socket:   socket,
 		send:     make(chan message),
 		room:     room,

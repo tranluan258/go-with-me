@@ -8,7 +8,7 @@ import (
 
 func MustAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		_, err := ctx.Cookie("username")
+		_, err := ctx.Cookie("user_id")
 		if err != nil {
 			return ctx.Redirect(http.StatusSeeOther, "/login")
 		}

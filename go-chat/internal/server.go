@@ -1,12 +1,15 @@
 package internal
 
 import (
+	"context"
+	"go-chat/internal/db"
 	"go-chat/internal/models"
 	"io"
 	"net/http"
 	"text/template"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo"
 )
 
@@ -19,6 +22,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 func Init() {
+	conn := db.InitDb()
 	t := &Template{
 		templates: template.Must(template.ParseGlob("views/*.html")),
 	}
@@ -43,23 +47,42 @@ func Init() {
 	}))
 
 	e.GET("/login", func(ctx echo.Context) error {
-		_, err := ctx.Cookie("username")
+		_, err := ctx.Cookie("user_id")
 		if err == nil {
-			return ctx.Redirect(http.StatusSeeOther, "/login")
+			return ctx.Redirect(http.StatusSeeOther, "/")
 		}
 		return ctx.Render(200, "login.html", nil)
 	})
 
 	e.POST("/login", func(ctx echo.Context) error {
-		var user models.User
+		var login models.Login
 
-		err := ctx.Bind(&user)
+		err := ctx.Bind(&login)
 		if err != nil {
 			return ctx.String(http.StatusBadRequest, "bad request")
 		}
+
+		rows, err := conn.Query(context.Background(), "SELECT id,username,password,full_name,avatar FROM users WHERE username=$1 and password=$2 LIMIT 1", login.Username, login.Password)
+		if err != nil {
+			return ctx.String(http.StatusBadRequest, err.Error())
+		}
+
+		users, err := pgx.CollectRows(rows, pgx.RowToStructByPos[models.User])
+		if err != nil || len(users) == 0 {
+			return ctx.String(http.StatusUnauthorized, "username or password invalid"+err.Error())
+		}
+		user := users[0]
+
+		usernameCookie := new(http.Cookie)
+		usernameCookie.Name = "full_name"
+		usernameCookie.Value = user.FullName
+		usernameCookie.Expires = time.Now().Add(24 * time.Hour)
+		usernameCookie.HttpOnly = true
+		ctx.SetCookie(usernameCookie)
+
 		cookie := new(http.Cookie)
-		cookie.Name = "username"
-		cookie.Value = user.Username
+		cookie.Name = "user_id"
+		cookie.Value = user.ID
 		cookie.Expires = time.Now().Add(24 * time.Hour)
 		cookie.HttpOnly = true
 		ctx.SetCookie(cookie)
