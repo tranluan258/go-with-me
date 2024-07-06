@@ -76,22 +76,22 @@ if (window["WebSocket"]) {
    */
   conn.onmessage = function (evt) {
     /**
-     * @type {{username: string; msg: string,type?:string}}
+     * @type {{full_name: string; msg: string,type?:string}}
      */
     const data = JSON.parse(evt.data);
 
     switch (data?.type) {
       case "joined":
-        addUserToList(data.username);
+        addUserToList(data.full_name);
         return;
       case "left":
-        removeUserFromList(data.username);
+        removeUserFromList(data.full_name);
         return;
       case "user-list":
-        addUserToList(data.username, false);
+        addUserToList(data.full_name, false);
         return;
       default:
-        createMessageElement(data.msg, true, data.username);
+        createMessageElement(data.msg, true, data.full_name);
     }
   };
 }

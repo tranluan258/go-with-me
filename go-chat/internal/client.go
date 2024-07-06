@@ -1,14 +1,17 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
+	"log"
 
 	"github.com/gorilla/websocket"
+	"github.com/jackc/pgx/v5"
 )
 
 type message struct {
-	Sender   string `json:"sender"`
-	Username string `json:"username"`
+	SenderId string `json:"sender_id"`
+	FullName string `json:"full_name"`
 	Msg      string `json:"msg"`
 	Type     string `json:"type"`
 }
@@ -19,6 +22,7 @@ type client struct {
 	room     *room
 	clientId string
 	fullName string
+	conn     *pgx.Conn
 }
 
 func (c *client) read() {
@@ -31,10 +35,11 @@ func (c *client) read() {
 			return
 		}
 		json.Unmarshal(msg, &message)
-		message.Sender = c.clientId
-		message.Username = c.fullName
-
+		message.SenderId = c.clientId
+		message.FullName = c.fullName
 		c.room.forward <- message
+
+		c.insertMessgeToDb(message)
 	}
 }
 
@@ -48,4 +53,14 @@ func (c *client) write() {
 			return
 		}
 	}
+}
+
+func (c *client) insertMessgeToDb(msg message) {
+	_, err := c.conn.Exec(context.Background(), "INSERT INTO messages(sender_id,full_name,message) VALUES($1,$2,$3)", msg.SenderId, msg.FullName, msg.Msg)
+	if err != nil {
+		log.Println("error insert message", err.Error())
+		return
+	}
+
+	log.Println("insert new message")
 }

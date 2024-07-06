@@ -39,9 +39,9 @@ func (r *room) run() {
 			r.sendJoinedOrLeft(client, "left")
 			log.Println("client left")
 		case msg := <-r.forward:
-			log.Println("new message from ", msg.Username)
+			log.Println("new message from ", msg.FullName)
 			for client := range r.clients {
-				if msg.Sender != r.clients[client].clientId {
+				if msg.SenderId != r.clients[client].clientId {
 					r.clients[client].send <- msg
 				}
 			}
@@ -51,8 +51,8 @@ func (r *room) run() {
 
 func (r *room) sendJoinedOrLeft(client *client, event string) {
 	msg := message{
-		Sender:   client.clientId,
-		Username: client.fullName,
+		SenderId: client.clientId,
+		FullName: client.fullName,
 		Msg:      client.fullName + " " + event,
 		Type:     event,
 	}
@@ -67,8 +67,8 @@ func (r *room) sendCurrUserForNewUser(newClient *client) {
 	for client := range r.clients {
 		if client != newClient.clientId {
 			msg := message{
-				Sender:   r.clients[client].clientId,
-				Username: r.clients[client].fullName,
+				SenderId: r.clients[client].clientId,
+				FullName: r.clients[client].fullName,
 				Type:     "user-list",
 			}
 			newClient.send <- msg

@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo"
 )
 
@@ -14,7 +15,7 @@ func NewWsHandler() *WsHandler {
 	}
 }
 
-func (ws *WsHandler) Serve(c echo.Context) error {
+func (ws *WsHandler) Serve(c echo.Context, conn *pgx.Conn) error {
 	fullName, _ := c.Cookie("full_name")
 	clientId, _ := c.Cookie("user_id")
 	socket, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
@@ -43,6 +44,7 @@ func (ws *WsHandler) Serve(c echo.Context) error {
 		socket:   socket,
 		send:     make(chan message),
 		room:     room,
+		conn:     conn,
 	}
 	room.join <- client
 
