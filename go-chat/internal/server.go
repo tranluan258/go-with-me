@@ -35,7 +35,22 @@ func Init() {
 	wsHanlder := NewWsHandler()
 
 	e.GET("/", MustAuth(func(ctx echo.Context) error {
-		return ctx.Render(http.StatusOK, "index.html", nil)
+		cookie, _ := ctx.Cookie("user_id")
+		rows, err := conn.Query(context.Background(), "SELECT id,username,password,full_name,avatar FROM users WHERE id=$1 LIMIT 1", cookie.Value)
+		if err != nil {
+			return ctx.String(http.StatusBadRequest, err.Error())
+		}
+
+		users, err := pgx.CollectRows(rows, pgx.RowToStructByPos[models.User])
+		if err != nil || len(users) == 0 {
+			return ctx.String(http.StatusUnauthorized, "username or password invalid"+err.Error())
+		}
+		user := users[0]
+
+		return ctx.Render(http.StatusOK, "index.html", map[string]interface{}{
+			"Avatar":   user.Avartar,
+			"FullName": user.FullName,
+		})
 	}))
 
 	e.GET("/ws/:id", MustAuth(func(ctx echo.Context) error {
@@ -87,6 +102,16 @@ func Init() {
 		cookie.HttpOnly = true
 		ctx.SetCookie(cookie)
 		return ctx.String(200, "ok")
+	})
+
+	e.GET("/logout", func(ctx echo.Context) error {
+		cookies := ctx.Cookies()
+
+		for _, c := range cookies {
+			c.MaxAge = -1
+			ctx.SetCookie(c)
+		}
+		return ctx.Redirect(http.StatusSeeOther, "/login")
 	})
 
 	e.Logger.Fatal(e.Start("localhost:8080"))

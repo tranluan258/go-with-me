@@ -167,3 +167,11 @@ function selectEmoji(data) {
   const messageInput = document.getElementById("message-input");
   messageInput.value += data.native;
 }
+
+function toogleDropdown() {
+  const dropdownMenu = document.getElementById("dropdownMenu");
+  const logoutOption = document.getElementById("logoutOption");
+
+  dropdownMenu.style.display =
+    dropdownMenu.style.display === "block" ? "none" : "block";
+}

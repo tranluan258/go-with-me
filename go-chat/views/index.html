@@ -9,29 +9,56 @@
   </head>
   <body>
     <div class="chat-app">
-      <div class="user-list" id="userList">
-        <h3>Users in Room</h3>
-        <ul id="userListContainer">
-          <!-- Usernames will be added here dynamically -->
-        </ul>
+      <div class="navbar">
+        <div class="nav-links">
+          <a>Home</a>
+        </div>
+        <div class="profile-section">
+          <div class="profile-icon" id="profileIcon" onclick="toogleDropdown()">
+            {{if .Avatar}}
+            <img class="avatar" src="{{.Avatar}}" alt="avatar" />
+            {{else}}
+            <img
+              class="avatar"
+              src="assets/profile-simple-svgrepo-com.svg"
+              alt="avatar"
+            />
+            {{end}}
+          </div>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="logout" id="logoutOption">Logout</a>
+          </div>
+        </div>
       </div>
-      <div class="chat-container">
-        <div class="chat-header">
-          <h1>Chat App</h1>
+      <div class="content">
+        <div class="user-list" id="userList">
+          <h3>All Messages</h3>
+          <ul id="userListContainer">
+            <!-- Usernames will be added here dynamically -->
+          </ul>
         </div>
-        <div class="chat-messages" id="container">
-          <!-- Messages will be displayed here -->
-        </div>
-        <div class="chat-input">
-          <input
-            type="text"
-            id="message-input"
-            placeholder="Type a message..."
-          />
-          <button type="button" id="emojiButton" onclick="toggleEmojiPicker()">
-            😊
-          </button>
-          <button id="send-button" onclick="handleSendMessage()">Send</button>
+        <div class="chat-container">
+          <div class="chat-header">
+            <h3>Gigacha Chat</h3>
+          </div>
+          <div class="chat-messages" id="container">
+            <!-- Messages will be displayed here -->
+          </div>
+          <div class="chat-input">
+            <input
+              type="text"
+              id="message-input"
+              placeholder="Type a message..."
+            />
+            <button
+              type="button"
+              id="emojiButton"
+              onclick="toggleEmojiPicker()"
+            >
+              😊
+            </button>
+            <button id="send-button" onclick="handleSendMessage()">Send</button>
+          </div>
         </div>
       </div>
       <div id="toastContainer"></div>
