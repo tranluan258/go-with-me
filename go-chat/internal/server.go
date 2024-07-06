@@ -2,11 +2,9 @@ package internal
 
 import (
 	"context"
-	"fmt"
 	"go-chat/internal/db"
 	"go-chat/internal/models"
 	"io"
-	"log"
 	"net/http"
 	"text/template"
 	"time"
@@ -51,26 +49,19 @@ func Init() {
 
 		rows, err = conn.Query(context.Background(), "SELECT id,sender_id,message,full_name,created_time FROM messages  ORDER BY created_time DESC LIMIT 10 ")
 		if err != nil {
-			log.Println(err.Error())
 			return ctx.String(http.StatusInternalServerError, "server error")
 		}
 
 		messages, err := pgx.CollectRows(rows, pgx.RowToStructByPos[models.Message])
 		if err != nil {
-			log.Println(err.Error())
 			return ctx.String(http.StatusInternalServerError, "server error")
 		}
 
-		err = ctx.Render(http.StatusOK, "index.html", map[string]interface{}{
+		return ctx.Render(http.StatusOK, "index.html", map[string]interface{}{
 			"UserId":   user.ID,
 			"Avatar":   user.Avartar,
 			"Messages": messages,
 		})
-		if err != nil {
-			fmt.Println(err.Error())
-			return ctx.String(http.StatusInternalServerError, "server error")
-		}
-		return nil
 	}))
 
 	e.GET("/ws/:id", MustAuth(func(ctx echo.Context) error {
