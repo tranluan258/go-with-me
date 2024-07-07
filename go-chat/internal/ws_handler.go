@@ -1,9 +1,17 @@
 package internal
 
 import (
+	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo"
 )
+
+const (
+	socketBufferSize  = 1024
+	messageBufferSize = 256
+)
+
+var upgrader = &websocket.Upgrader{ReadBufferSize: socketBufferSize, WriteBufferSize: messageBufferSize}
 
 type WsHandler struct {
 	rooms map[string]*room

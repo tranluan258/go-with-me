@@ -2,8 +2,6 @@ package internal
 
 import (
 	"log"
-
-	"github.com/gorilla/websocket"
 )
 
 type room struct {
@@ -75,10 +73,3 @@ func (r *room) sendCurrUserForNewUser(newClient *client) {
 		}
 	}
 }
-
-const (
-	socketBufferSize  = 1024
-	messageBufferSize = 256
-)
-
-var upgrader = &websocket.Upgrader{ReadBufferSize: socketBufferSize, WriteBufferSize: messageBufferSize}
