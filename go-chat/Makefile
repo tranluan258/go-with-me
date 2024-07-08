@@ -1,6 +1,6 @@
 include .env
 run:
-	go run main.go
+	go run cmd/main.go
 
 up:
 	GOOSE_DRIVER=$(DB_DRIVER) GOOSE_DBSTRING=$(DB_URL) goose --dir $(MIGRATION_DIR) up

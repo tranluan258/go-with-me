@@ -60,6 +60,8 @@ func initHomeRoute(e *echo.Echo, conn *sqlx.DB) {
 func initLoginRoute(e *echo.Echo, conn *sqlx.DB) {
 	loginHandler := handlers.NewLoginHander(conn)
 
+	e.GET("/auth/:provider", loginHandler.BeginAuth)
+	e.GET("/auth/:provider/callback", loginHandler.CompleteAuth)
 	e.GET("/login", loginHandler.LoginGet)
 	e.POST("/login", loginHandler.PostLogin)
 	e.GET("/logout", loginHandler.Logout)
