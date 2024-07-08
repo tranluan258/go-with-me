@@ -1,16 +1,17 @@
 package db
 
 import (
-	"context"
+	"fmt"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/gommon/log"
+	_ "github.com/lib/pq"
 )
 
-func InitDb() *pgx.Conn {
-	dbUrl := "postgres://postgres:123456@localhost:5432/go_chat"
+func InitDb() *sqlx.DB {
+	dbUrl := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", "postgres", "123456", "go_chat")
 
-	conn, err := pgx.Connect(context.Background(), dbUrl)
+	conn, err := sqlx.Open("postgres", dbUrl)
 	if err != nil {
 		log.Errorf("Cannot connect db %s", err.Error())
 		panic(1)

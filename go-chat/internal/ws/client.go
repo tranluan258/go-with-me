@@ -1,12 +1,11 @@
 package ws
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 
 	"github.com/gorilla/websocket"
-	"github.com/jackc/pgx/v5"
+	"github.com/jmoiron/sqlx"
 )
 
 type message struct {
@@ -20,9 +19,9 @@ type client struct {
 	socket   *websocket.Conn
 	send     chan message
 	room     *room
+	conn     *sqlx.DB
 	clientId string
 	fullName string
-	conn     *pgx.Conn
 }
 
 func (c *client) read() {
@@ -56,11 +55,10 @@ func (c *client) write() {
 }
 
 func (c *client) insertMessgeToDb(msg message) {
-	_, err := c.conn.Exec(context.Background(), "INSERT INTO messages(sender_id,full_name,message) VALUES($1,$2,$3)", msg.SenderId, msg.FullName, msg.Msg)
+	_, err := c.conn.Exec("INSERT INTO messages(sender_id,full_name,message) VALUES($1,$2,$3)", msg.SenderId, msg.FullName, msg.Msg)
 	if err != nil {
 		log.Println("error insert message", err.Error())
 		return
 	}
-
 	log.Println("insert new message")
 }

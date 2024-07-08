@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"text/template"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 )
 
@@ -39,7 +39,7 @@ func Init() {
 	e.Logger.Fatal(e.Start("localhost:8080"))
 }
 
-func intWsRoute(e *echo.Echo, conn *pgx.Conn) {
+func intWsRoute(e *echo.Echo, conn *sqlx.DB) {
 	wsHanlder := ws.NewWsHandler()
 
 	e.GET("/ws/:id", MustAuth(func(ctx echo.Context) error {
@@ -51,13 +51,13 @@ func intWsRoute(e *echo.Echo, conn *pgx.Conn) {
 	}))
 }
 
-func initHomeRoute(e *echo.Echo, conn *pgx.Conn) {
+func initHomeRoute(e *echo.Echo, conn *sqlx.DB) {
 	homeHandler := handlers.NewHomeHandler(conn)
 
 	e.GET("/", MustAuth(homeHandler.GetHomeTemplate))
 }
 
-func initLoginRoute(e *echo.Echo, conn *pgx.Conn) {
+func initLoginRoute(e *echo.Echo, conn *sqlx.DB) {
 	loginHandler := handlers.NewLoginHander(conn)
 
 	e.GET("/login", loginHandler.LoginGet)

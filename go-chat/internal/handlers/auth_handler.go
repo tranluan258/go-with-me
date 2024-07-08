@@ -1,20 +1,19 @@
 package handlers
 
 import (
-	"context"
 	"go-chat/internal/models"
 	"net/http"
 	"time"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 )
 
 type AuthHander struct {
-	db *pgx.Conn
+	db *sqlx.DB
 }
 
-func NewLoginHander(db *pgx.Conn) *AuthHander {
+func NewLoginHander(db *sqlx.DB) *AuthHander {
 	return &AuthHander{
 		db: db,
 	}
@@ -30,9 +29,9 @@ func (lh *AuthHander) PostLogin(ctx echo.Context) error {
 
 	var user models.User
 
-	err = lh.db.QueryRow(context.Background(), "SELECT id,username,password,full_name,avatar FROM users WHERE username=$1 and password=$2 LIMIT 1", login.Username, login.Password).Scan(&user.ID, &user.Username, &user.Password, &user.FullName, &user.Avartar)
+	err = lh.db.Get(&user, "SELECT id,username,password,full_name,avatar FROM users WHERE username=$1 and password=$2", login.Username, login.Password)
 	if err != nil {
-		return ctx.String(http.StatusBadRequest, "invalid credentials")
+		return ctx.String(http.StatusUnauthorized, "invalid credentials")
 	}
 
 	usernameCookie := new(http.Cookie)

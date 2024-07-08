@@ -2,7 +2,7 @@ package ws
 
 import (
 	"github.com/gorilla/websocket"
-	"github.com/jackc/pgx/v5"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 )
 
@@ -23,7 +23,7 @@ func NewWsHandler() *WsHandler {
 	}
 }
 
-func (ws *WsHandler) Serve(c echo.Context, conn *pgx.Conn) error {
+func (ws *WsHandler) Serve(c echo.Context, conn *sqlx.DB) error {
 	fullName, _ := c.Cookie("full_name")
 	clientId, _ := c.Cookie("user_id")
 	socket, err := upgrader.Upgrade(c.Response(), c.Request(), nil)

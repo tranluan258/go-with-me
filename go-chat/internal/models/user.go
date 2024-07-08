@@ -6,9 +6,9 @@ type Login struct {
 }
 
 type User struct {
-	ID       string  `json:"id"`
-	Username string  `json:"username"`
-	Password string  `json:"password"`
-	FullName string  `json:"full_name"`
-	Avartar  *string `json:"avatar"`
+	Avartar  *string `json:"avatar" db:"avatar"`
+	ID       string  `json:"id" db:"id"`
+	Username string  `json:"username" db:"username"`
+	Password string  `json:"password" db:"password"`
+	FullName string  `json:"full_name" db:"full_name"`
 }
