@@ -41,7 +41,7 @@ func (ah *AuthHander) PostLogin(ctx echo.Context) error {
 		return ctx.String(http.StatusUnauthorized, "invalid credentials")
 	}
 	ah.SetCookie(ctx, user.FullName, user.ID)
-	return ctx.String(200, "ok")
+	return ctx.Redirect(http.StatusSeeOther, "/")
 }
 
 func (ah *AuthHander) LoginGet(ctx echo.Context) error {
