@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	GOOGLE_PROVDIER = "google"
+	GOOGLE_PROVDIER   = "google"
+	FACEBOOK_PROVIDER = "facebook"
 )
 
 type AuthHander struct {
@@ -50,7 +51,8 @@ func (ah *AuthHander) LoginGet(ctx echo.Context) error {
 		return ctx.Redirect(http.StatusSeeOther, "/")
 	}
 	return ctx.Render(200, "login.html", map[string]interface{}{
-		"GoogleUrl": os.Getenv("GOOGLE_URL"),
+		"GoogleUrl":   os.Getenv("GOOGLE_URL"),
+		"FacebookUrl": os.Getenv("FACEBOOK_URL"),
 	})
 }
 
@@ -67,7 +69,7 @@ func (ah *AuthHander) Logout(ctx echo.Context) error {
 func (ah *AuthHander) BeginAuth(ctx echo.Context) error {
 	provider := ctx.Param("provider")
 
-	if provider != GOOGLE_PROVDIER {
+	if provider != GOOGLE_PROVDIER && provider != FACEBOOK_PROVIDER {
 		return ctx.String(http.StatusBadRequest, "not supported")
 	}
 
