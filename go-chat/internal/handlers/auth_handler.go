@@ -42,7 +42,8 @@ func (ah *AuthHander) PostLogin(ctx echo.Context) error {
 		return ctx.String(http.StatusUnauthorized, "invalid credentials")
 	}
 	ah.SetCookie(ctx, user.FullName, user.ID)
-	return ctx.Redirect(http.StatusSeeOther, "/")
+	ctx.Response().Header().Add("HX-Redirect", "/")
+	return ctx.String(http.StatusFound, "login success")
 }
 
 func (ah *AuthHander) LoginGet(ctx echo.Context) error {
@@ -70,7 +71,7 @@ func (ah *AuthHander) BeginAuth(ctx echo.Context) error {
 	provider := ctx.Param("provider")
 
 	if provider != GOOGLE_PROVDIER && provider != FACEBOOK_PROVIDER {
-		return ctx.String(http.StatusBadRequest, "not supported")
+		return ctx.String(http.StatusBadRequest, "provider not supported")
 	}
 
 	q := ctx.Request().URL.Query()
@@ -89,8 +90,8 @@ func (ah *AuthHander) CompleteAuth(ctx echo.Context) error {
 		return ctx.String(http.StatusInternalServerError, "server error")
 	}
 
-	err = ah.db.Get(&existedUser, "SELECT id,username,password,full_name,avatar FROM users WHERE username=$1", oauhtUser.UserID)
-	if err != nil {
+	isEmpty := ah.db.Get(&existedUser, "SELECT id,username,password,full_name,avatar FROM users WHERE username=$1", oauhtUser.UserID)
+	if isEmpty != nil {
 		_, err := ah.db.NamedExec("INSERT INTO users (username, password,full_name,avatar) VALUES(:username,:password,:full_name,:avatar)", map[string]interface{}{
 			"username":  oauhtUser.UserID,
 			"password":  oauhtUser.UserID,
@@ -99,15 +100,12 @@ func (ah *AuthHander) CompleteAuth(ctx echo.Context) error {
 		})
 		if err != nil {
 			log.Println(err.Error())
-			return err
+			return ctx.String(http.StatusInternalServerError, "server error")
 		}
 
 		newUser := models.User{}
-		err = ah.db.Get(&newUser, "SELECT id,username,password,full_name,avatar FROM users WHERE username=$1", oauhtUser.UserID)
-		if err != nil {
-			log.Println(err.Error())
-			return err
-		}
+		ah.db.Get(&newUser, "SELECT id,username,password,full_name,avatar FROM users WHERE username=$1", oauhtUser.UserID)
+
 		ah.SetCookie(ctx, newUser.FullName, newUser.ID)
 		return ctx.Redirect(http.StatusTemporaryRedirect, "/")
 	}

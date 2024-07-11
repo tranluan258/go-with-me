@@ -1,15 +1,11 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login Page</title>
-    <link rel="stylesheet" href="css/login.css" />
-    <script defer src="js/login.js"></script>
-  </head>
+  {{template "layout" .}}
+  <link rel="stylesheet" href="css/login.css" />
   <body>
     <div class="login-container">
-      <div class="login-form">
+      <!-- TODO: fix problem for error case login -->
+      <form class="login-form" hx-post="/login" hx-target="body">
         <h2 class="title">Welcome Back</h2>
         <div class="input-group">
           <label for="username">Username</label>
@@ -19,9 +15,10 @@
           <label for="password">Password</label>
           <input type="password" id="password" name="password" required />
         </div>
-        <button type="button" class="login-button" onclick="handleLogin()">
-          Login
-        </button>
+        <button type="submit" class="login-button">Login</button>
+        {{if .Errors}}
+        <div>{{.Errors}}</div>
+        {{end}}
         <p class="forgot-password"><a href="#">Forgot your password?</a></p>
         <div class="social-login">
           <a href="{{.GoogleUrl}}" class="google-button">
@@ -31,7 +28,7 @@
             <img src="assets/facebook_icon.svg" alt="Facebook icon" />
           </a>
         </div>
-      </div>
+      </form>
     </div>
   </body>
 </html>

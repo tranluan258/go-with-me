@@ -1,13 +1,8 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Chat Example</title>
-    <script defer src="js/script.js"></script>
-    <script defer src="js/htmx.min.js"></script>
-    <link rel="stylesheet" href="css/style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
-  </head>
+  {{template "layout" .}}
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="js/script.js"></script>
   <body>
     <div class="chat-app">
       <div class="navbar">
@@ -43,25 +38,7 @@
             <h3>Gigacha Chat</h3>
           </div>
           <div class="chat-messages" id="container">
-            {{ range .Messages }}
-            <!-- if statement -->
-            {{ if eq .SenderId $.UserId}}
-            <div class="message sent">
-              <div class="metadata">
-                <span class="time">Me</span>
-              </div>
-              <span>{{.Message}}</span>
-            </div>
-            {{else}}
-            <div class="message received">
-              <div class="metadata">
-                <span class="time">{{.FullName}}</span>
-              </div>
-              <span>{{.Message}}</span>
-            </div>
-            {{end}}
-            <!-- if statement -->
-            {{end}}
+            {{template "messages" .}}
           </div>
           <div class="chat-input">
             <input
