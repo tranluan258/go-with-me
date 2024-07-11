@@ -4,16 +4,38 @@
   <link rel="stylesheet" href="css/login.css" />
   <body>
     <div class="login-container">
-      <!-- TODO: fix problem for error case login -->
-      <form class="login-form" hx-post="/login" hx-target="body">
+      <form
+        class="login-form"
+        hx-post="/login"
+        hx-swap="outerHTML"
+        hx-target="body"
+      >
         <h2 class="title">Welcome Back</h2>
         <div class="input-group">
           <label for="username">Username</label>
-          <input type="text" id="username" name="username" required />
+          <input
+            type="text"
+            id="username"
+            name="username"
+            {{if
+            .Username}}
+            value="{{.Username}}"
+            {{end}}
+            required
+          />
         </div>
         <div class="input-group">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" required />
+          <input
+            type="password"
+            id="password"
+            name="password"
+            {{if
+            .Password}}
+            value="{{.Password}}"
+            {{end}}
+            required
+          />
         </div>
         <button type="submit" class="login-button">Login</button>
         {{if .Errors}}

@@ -39,7 +39,11 @@ func (ah *AuthHander) PostLogin(ctx echo.Context) error {
 
 	err = ah.db.Get(&user, "SELECT id,username,password,full_name,avatar FROM users WHERE username=$1 and password=$2", login.Username, login.Password)
 	if err != nil {
-		return ctx.String(http.StatusUnauthorized, "invalid credentials")
+		return ctx.Render(http.StatusUnauthorized, "login.html", map[string]interface{}{
+			"Errors":   "Invalid credentials",
+			"Username": login.Username,
+			"Password": login.Password,
+		})
 	}
 	ah.SetCookie(ctx, user.FullName, user.ID)
 	ctx.Response().Header().Add("HX-Redirect", "/")
