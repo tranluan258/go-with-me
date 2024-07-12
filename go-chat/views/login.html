@@ -38,9 +38,6 @@
           />
         </div>
         <button type="submit" class="login-button">Login</button>
-        {{if .Errors}}
-        <div>{{.Errors}}</div>
-        {{end}}
         <p class="forgot-password"><a href="#">Forgot your password?</a></p>
         <div class="social-login">
           <a href="{{.GoogleUrl}}" class="google-button">
@@ -52,5 +49,8 @@
         </div>
       </form>
     </div>
+    {{if .Errors}}
+    <div class="toast show" id="toast">{{.Errors}}</div>
+    {{end}}
   </body>
 </html>

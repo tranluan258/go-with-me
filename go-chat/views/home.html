@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   {{template "layout" .}}
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/home.css" />
   <script defer src="js/script.js"></script>
   <body>
     <div class="chat-app">
@@ -28,15 +28,12 @@
       </div>
       <div class="content">
         <div class="user-list" id="userList">
-          <h3>All Messages</h3>
+          <h3>Recent Chats</h3>
           <ul id="userListContainer">
-            <!-- Usernames will be added here dynamically -->
+            {{template "friends" .}}
           </ul>
         </div>
         <div class="chat-container">
-          <div class="chat-header">
-            <h3>Gigacha Chat</h3>
-          </div>
           <div class="chat-messages" id="container">
             {{template "messages" .}}
           </div>
@@ -61,3 +58,13 @@
     </div>
   </body>
 </html>
+
+{{define "friends"}}
+<!-- block -->
+{{range .Friends}}
+<li id="friend-{{.ID}}">
+  <span>{{.FullName}}</span>
+</li>
+{{end}}
+<!-- block -->
+{{end}}

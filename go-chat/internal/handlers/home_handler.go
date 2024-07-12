@@ -21,9 +21,15 @@ func NewHomeHandler(db *sqlx.DB) *HomeHandler {
 func (hh *HomeHandler) GetHomeTemplate(ctx echo.Context) error {
 	cookie, _ := ctx.Cookie("user_id")
 	var user models.User
+	var listFiends []models.User
 	var messages []models.Message
 
-	err := hh.db.Get(&user, "SELECT id,username,password,full_name,avatar FROM users WHERE id=$1", cookie.Value)
+	err := hh.db.Get(&user, "SELECT id,username,full_name,avatar FROM users WHERE id=$1", cookie.Value)
+	if err != nil {
+		return ctx.String(http.StatusInternalServerError, "server error")
+	}
+
+	err = hh.db.Select(&listFiends, "SELECT id,username,full_name,avatar FROM users WHERE id!=$1", cookie.Value)
 	if err != nil {
 		return ctx.String(http.StatusInternalServerError, "server error")
 	}
@@ -33,9 +39,10 @@ func (hh *HomeHandler) GetHomeTemplate(ctx echo.Context) error {
 		return ctx.String(http.StatusInternalServerError, "server error")
 	}
 
-	return ctx.Render(http.StatusOK, "index.html", map[string]interface{}{
+	return ctx.Render(http.StatusOK, "home.html", map[string]interface{}{
 		"UserId":   user.ID,
 		"Avatar":   user.Avartar,
 		"Messages": messages,
+		"Friends":  listFiends,
 	})
 }

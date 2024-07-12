@@ -5,6 +5,7 @@ import (
 	"go-chat/internal/handlers"
 	"go-chat/internal/ws"
 	"io"
+	"log"
 	"net/http"
 	"text/template"
 
@@ -17,7 +18,12 @@ type Template struct {
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
+	err := t.templates.ExecuteTemplate(w, name, data)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+	return nil
 }
 
 func Init() {

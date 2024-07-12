@@ -79,20 +79,7 @@ if (window["WebSocket"]) {
      * @type {{full_name: string; msg: string,type?:string}}
      */
     const data = JSON.parse(evt.data);
-
-    switch (data?.type) {
-      case "joined":
-        addUserToList(data.full_name);
-        return;
-      case "left":
-        removeUserFromList(data.full_name);
-        return;
-      case "user-list":
-        addUserToList(data.full_name, false);
-        return;
-      default:
-        createMessageElement(data.msg, true, data.full_name);
-    }
+    createMessageElement(data.msg, true, data.full_name);
   };
 }
 
@@ -103,50 +90,6 @@ document
       document.getElementById("send-button").click();
     }
   });
-
-/**
- * @param {string} message
- * @param {'left'| 'joined'} event
- */
-function showToast(message, event) {
-  const toastContainer = document.getElementById("toastContainer");
-  const toast = document.createElement("div");
-  toast.className = event === "left" ? "toast-left" : "toast-joined";
-  toast.textContent = message;
-
-  toastContainer.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3000); // Toast duration
-}
-
-/**
- * @param {string} username
- * @param {boolean} [isShow]
- */
-function addUserToList(username, isShow) {
-  const userListContainer = document.getElementById("userListContainer");
-  const userItem = document.createElement("li");
-  userItem.id = `user-${username}`;
-  userItem.textContent = username;
-  userListContainer.appendChild(userItem);
-
-  if (isShow) {
-    showToast(`${username} has joined the chat!`, "joined");
-  }
-}
-
-/**
- * @param {string} username
- */
-function removeUserFromList(username) {
-  const userItem = document.getElementById(`user-${username}`);
-  if (userItem) {
-    userItem.remove();
-    showToast(`${username} has left the chat!`, "left");
-  }
-}
 
 function toggleEmojiPicker() {
   const existPicket = document.querySelector(".emoji-picker");
@@ -162,16 +105,16 @@ function toggleEmojiPicker() {
   }
 }
 
+/**
+ * @param {{native: string}} data
+ */
 function selectEmoji(data) {
-  console.log(data);
   const messageInput = document.getElementById("message-input");
   messageInput.value += data.native;
 }
 
 function toogleDropdown() {
   const dropdownMenu = document.getElementById("dropdownMenu");
-  const logoutOption = document.getElementById("logoutOption");
-
   dropdownMenu.style.display =
     dropdownMenu.style.display === "block" ? "none" : "block";
 }

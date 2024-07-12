@@ -26,16 +26,13 @@ func (r *room) run() {
 	for {
 		select {
 		case client := <-r.join:
+			log.Println("new client", client.clientId, r.roomId)
 			if r.clients[client.clientId] == nil {
 				r.clients[client.clientId] = client
 			}
-			r.sendJoinedOrLeft(client, "joined")
-			r.sendCurrUserForNewUser(client)
-			log.Println("new client", client.clientId, r.roomId)
 		case client := <-r.leave:
-			delete(r.clients, client.clientId)
-			r.sendJoinedOrLeft(client, "left")
 			log.Println("client left")
+			delete(r.clients, client.clientId)
 		case msg := <-r.forward:
 			log.Println("new message from ", msg.FullName)
 			for client := range r.clients {
