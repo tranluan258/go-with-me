@@ -1,23 +1,27 @@
 /**
  * @type {WebSocket}
  */
-var conn;
-
-/**
- * @type {Array<string>}
- */
-var users = [];
+let conn;
 
 /**
  * @param {HTMLElement} item
  * @description Append messageElement to chatContainer
  */
 function appendMessageToContainer(item) {
-  var log = document.getElementById("container");
-  var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
-  log.appendChild(item);
+  /**
+   * @type {HTMLElement | null}
+   */
+  const chatContainer = document.getElementById("container");
+  if (!chatContainer) return;
+
+  const doScroll =
+    chatContainer.scrollTop >
+    chatContainer.scrollHeight - chatContainer.clientHeight - 1;
+
+  chatContainer.appendChild(item);
   if (doScroll) {
-    log.scrollTop = log.scrollHeight - log.clientHeight;
+    chatContainer.scrollTop =
+      chatContainer.scrollHeight - chatContainer.clientHeight;
   }
 }
 
@@ -51,13 +55,16 @@ function createMessageElement(msg, isRec, username) {
  * @description Handle send message websocket
  */
 function handleSendMessage() {
-  var msg = document.getElementById("message-input");
-  if (!conn) {
-    return;
-  }
-  if (!msg.value) {
-    return;
-  }
+  /**
+   * @type {HTMLInputElement | null}
+   * */
+  // @ts-ignore
+  const msg = document.getElementById("message-input");
+  if (!conn) return;
+  if (!msg) return;
+
+  if (!msg.value) return;
+
   createMessageElement(msg.value, false);
   conn.send(
     JSON.stringify({
@@ -67,7 +74,6 @@ function handleSendMessage() {
 
   msg.value = "";
 }
-// TODO: handle connect when select chat room
 // if (window["WebSocket"]) {
 //   const url = "ws://localhost:8080/ws/1";
 //   conn = new WebSocket(url);
@@ -86,9 +92,9 @@ function handleSendMessage() {
 //
 document
   .getElementById("message-input")
-  .addEventListener("keypress", function (e) {
+  ?.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
-      document.getElementById("send-button").click();
+      document.getElementById("send-button")?.click();
     }
   });
 
@@ -98,11 +104,12 @@ function toggleEmojiPicker() {
     existPicket.remove();
   } else {
     const pickerOptions = { onEmojiSelect: selectEmoji };
+    // @ts-ignore
     const picker = new EmojiMart.Picker(pickerOptions);
     picker.className = "emoji-picker";
 
     const chatApp = document.querySelector(".chat-input");
-    chatApp.appendChild(picker);
+    chatApp?.appendChild(picker);
   }
 }
 
@@ -111,11 +118,14 @@ function toggleEmojiPicker() {
  */
 function selectEmoji(data) {
   const messageInput = document.getElementById("message-input");
+  if (!messageInput) return;
+  // @ts-ignore
   messageInput.value += data.native;
 }
 
 function toogleDropdown() {
   const dropdownMenu = document.getElementById("dropdownMenu");
+  if (!dropdownMenu) return;
   dropdownMenu.style.display =
     dropdownMenu.style.display === "block" ? "none" : "block";
 }
