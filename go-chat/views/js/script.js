@@ -67,22 +67,23 @@ function handleSendMessage() {
 
   msg.value = "";
 }
-if (window["WebSocket"]) {
-  const url = "ws://localhost:8080/ws/1";
-  conn = new WebSocket(url);
-
-  /**
-   * @param {MessageEvent<{data: string}>} evt
-   */
-  conn.onmessage = function (evt) {
-    /**
-     * @type {{full_name: string; msg: string,type?:string}}
-     */
-    const data = JSON.parse(evt.data);
-    createMessageElement(data.msg, true, data.full_name);
-  };
-}
-
+// TODO: handle connect when select chat room
+// if (window["WebSocket"]) {
+//   const url = "ws://localhost:8080/ws/1";
+//   conn = new WebSocket(url);
+//
+//   /**
+//    * @param {MessageEvent<{data: string}>} evt
+//    */
+//   conn.onmessage = function (evt) {
+//     /**
+//      * @type {{full_name: string; msg: string,type?:string}}
+//      */
+//     const data = JSON.parse(evt.data);
+//     createMessageElement(data.msg, true, data.full_name);
+//   };
+// }
+//
 document
   .getElementById("message-input")
   .addEventListener("keypress", function (e) {
