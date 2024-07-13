@@ -46,14 +46,14 @@
         </div>
       </div>
       <div class="flex h-full">
-        <div class="w-1/5 p-5" id="userList">
+        <div class="w-1/5 p-5" id="rooms">
           <h3 class="font-bold text-lg mb-2">Recent Chats</h3>
           <ul class="list-none">
-            {{template "friends" .}}
+            {{template "rooms" .}}
           </ul>
         </div>
         <div class="chat-container">
-          <div class="chat-messages" id="container">
+          <div class="chat-messages" id="chat-messages">
             {{template "messages" .}}
           </div>
           <div class="chat-input">
@@ -78,12 +78,16 @@
   </body>
 </html>
 
-{{define "friends"}}
+{{define "rooms"}}
 <!-- block -->
-{{range .Friends}}
+{{range .Rooms}}
 <li
   id="{{.ID}}"
   class="flex items-center w-full h-[70px] mb-2 p-4 rounded-xl cursor-pointer hover:bg-gray-50"
+  hx-get="rooms/{{.ID}}"
+  hx-target="#chat-messages"
+  hx-swap="innerHTML"
+  onclick="connectWs(event)"
 >
   {{if .Avatar}}
   <img
@@ -98,7 +102,7 @@
     </div>
   </div>
   {{end}}
-  <span class="ml-3 truncate">{{.FullName}}</span>
+  <span class="ml-3 truncate">{{.Name}}</span>
 </li>
 {{end}}
 <!-- block -->

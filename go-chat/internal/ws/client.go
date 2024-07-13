@@ -55,7 +55,7 @@ func (c *client) write() {
 }
 
 func (c *client) insertMessgeToDb(msg message) {
-	_, err := c.conn.Exec("INSERT INTO messages(sender_id,full_name,message) VALUES($1,$2,$3)", msg.SenderId, msg.FullName, msg.Msg)
+	_, err := c.conn.Exec("INSERT INTO messages(sender_id,full_name,message,room_id) VALUES($1,$2,$3,$4)", msg.SenderId, msg.FullName, msg.Msg, c.room.roomId)
 	if err != nil {
 		log.Println("error insert message", err.Error())
 		return

@@ -11,7 +11,7 @@ function appendMessageToContainer(item) {
   /**
    * @type {HTMLElement | null}
    */
-  const chatContainer = document.getElementById("container");
+  const chatContainer = document.getElementById("chat-messages");
   if (!chatContainer) return;
 
   const doScroll =
@@ -74,22 +74,31 @@ function handleSendMessage() {
 
   msg.value = "";
 }
-// if (window["WebSocket"]) {
-//   const url = "ws://localhost:8080/ws/1";
-//   conn = new WebSocket(url);
-//
-//   /**
-//    * @param {MessageEvent<{data: string}>} evt
-//    */
-//   conn.onmessage = function (evt) {
-//     /**
-//      * @type {{full_name: string; msg: string,type?:string}}
-//      */
-//     const data = JSON.parse(evt.data);
-//     createMessageElement(data.msg, true, data.full_name);
-//   };
-// }
-//
+
+/**
+ * @param {Event} e
+ */
+function connectWs(e) {
+  if (window["WebSocket"]) {
+    // @ts-ignore
+    const roomId = e.target?.id;
+    const url = "ws://localhost:8080/ws/" + roomId;
+    conn = new WebSocket(url);
+
+    /**
+     * @param {MessageEvent<{data: string}>} evt
+     */
+    conn.onmessage = function (evt) {
+      /**
+       * @type {{full_name: string; msg: string,type?:string}}
+       */
+      // @ts-ignore
+      const data = JSON.parse(evt.data);
+      createMessageElement(data.msg, true, data.full_name);
+    };
+  }
+}
+
 document
   .getElementById("message-input")
   ?.addEventListener("keypress", function (e) {

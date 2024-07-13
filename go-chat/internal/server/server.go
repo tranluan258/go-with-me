@@ -41,6 +41,7 @@ func Init() {
 	intWsRoute(e, conn)
 	initHomeRoute(e, conn)
 	initLoginRoute(e, conn)
+	initRoomRoute(e, conn)
 
 	e.Logger.Fatal(e.Start("localhost:8080"))
 }
@@ -71,4 +72,11 @@ func initLoginRoute(e *echo.Echo, conn *sqlx.DB) {
 	e.GET("/login", loginHandler.LoginGet)
 	e.POST("/login", loginHandler.PostLogin)
 	e.GET("/logout", loginHandler.Logout)
+}
+
+func initRoomRoute(e *echo.Echo, conn *sqlx.DB) {
+	roomHandler := handlers.NewRoomHandler(conn)
+
+	e.POST("/rooms", MustAuth(roomHandler.CreateRoom))
+	e.GET("/rooms/:room_id", MustAuth(roomHandler.GetRoomById))
 }

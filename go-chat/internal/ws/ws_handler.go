@@ -1,6 +1,9 @@
 package ws
 
 import (
+	"go-chat/internal/models"
+	"net/http"
+
 	"github.com/gorilla/websocket"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
@@ -34,6 +37,12 @@ func (ws *WsHandler) Serve(c echo.Context, conn *sqlx.DB) error {
 	roomId := c.Param("id")
 	if roomId == "" {
 		return err
+	}
+
+	existRoom := models.Room{}
+	err = conn.Get(&existRoom, "SELECT id FROM rooms WHERE id=$1", roomId)
+	if err != nil {
+		return c.String(http.StatusNotFound, "not found room")
 	}
 
 	var room *room
