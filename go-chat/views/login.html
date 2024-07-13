@@ -50,7 +50,11 @@
       </form>
     </div>
     {{if .Errors}}
-    <div class="toast show" id="toast">{{.Errors}}</div>
+    <div class="toast show toast-start z-50 left-1 bottom-2">
+      <div class="alert alert-error">
+        <span>{{.Errors}}</span>
+      </div>
+    </div>
     {{end}}
   </body>
 </html>

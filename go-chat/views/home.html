@@ -5,31 +5,50 @@
   <script defer src="js/script.js"></script>
   <body>
     <div class="chat-app">
-      <div class="navbar">
+      <div class="flex justify-between items-center py-3 pl-5">
         <div class="nav-links">
           <a>Home</a>
         </div>
-        <div class="profile-section">
-          <div class="profile-icon" id="profileIcon" onclick="toogleDropdown()">
+        <div class="profile-section w-16">
+          <div class="profile-icon" id="profileIcon">
             {{if .Avatar}}
-            <img class="avatar" src="{{.Avatar}}" alt="avatar" />
+            <div class="dropdown dropdown-end w-16 pr-4 mr-3">
+              <img
+                tabindex="0"
+                role="button"
+                class="avatar rounded-full object-cover w-24"
+                src="{{.Avatar}}"
+                alt="avatar "
+              />
+              <ul
+                tabindex="0"
+                class="dropdown-content menu bg-base-100 rounded-box z-[1] w-fit p-2 shadow"
+              >
+                <li><a href="/logout">Logout</a></li>
+              </ul>
+            </div>
             {{else}}
-            <img
-              class="avatar"
-              src="assets/profile-simple-svgrepo-com.svg"
-              alt="avatar"
-            />
+            <div class="dropdown dropdown-end">
+              <div class="avatar placeholder" tabindex="0" role="button">
+                <div class="bg-neutral text-neutral-content w-10 rounded-full">
+                  <span class="text-xs">UNE</span>
+                </div>
+              </div>
+              <ul
+                tabindex="0"
+                class="dropdown-content menu bg-base-100 rounded-box z-[1] w-fit p-2 shadow"
+              >
+                <li><a href="/logout">Logout</a></li>
+              </ul>
+            </div>
             {{end}}
-          </div>
-          <div class="dropdown-menu" id="dropdownMenu">
-            <a href="logout" id="logoutOption">Logout</a>
           </div>
         </div>
       </div>
-      <div class="content">
-        <div class="user-list" id="userList">
-          <h3>Recent Chats</h3>
-          <ul id="userListContainer">
+      <div class="flex h-full">
+        <div class="w-1/5 p-5" id="userList">
+          <h3 class="font-bold text-lg mb-2">Recent Chats</h3>
+          <ul class="list-none">
             {{template "friends" .}}
           </ul>
         </div>
@@ -62,8 +81,24 @@
 {{define "friends"}}
 <!-- block -->
 {{range .Friends}}
-<li id="friend-{{.ID}}">
-  <span>{{.FullName}}</span>
+<li
+  id="{{.ID}}"
+  class="flex items-center w-full h-[70px] mb-2 p-4 rounded-xl cursor-pointer hover:bg-gray-50"
+>
+  {{if .Avatar}}
+  <img
+    src="{{.Avatar}}"
+    alt="avatar"
+    class="object-cover h-full rounded-full w-10"
+  />
+  {{else}}
+  <div class="avatar placeholder">
+    <div class="bg-neutral text-neutral-content w-10 rounded-full">
+      <span class="text-xs">UNE</span>
+    </div>
+  </div>
+  {{end}}
+  <span class="ml-3 truncate">{{.FullName}}</span>
 </li>
 {{end}}
 <!-- block -->
