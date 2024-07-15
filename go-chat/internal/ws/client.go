@@ -28,6 +28,7 @@ func (c *client) read() {
 	defer c.socket.Close()
 
 	for {
+		// TODO: handle read message type binary
 		var message message
 		_, msg, err := c.socket.ReadMessage()
 		if err != nil {
