@@ -1,24 +1,33 @@
 {{define "messages"}}
 <!-- block -->
-{{ range .Messages }}
-<!-- if statement -->
-{{ if eq .SenderId $.UserId}}
-<div class="message sent">
-  <div class="metadata">
-    <span class="time">Me</span>
-  </div>
-  <span>{{.Message}}</span>
-</div>
-{{else}}
-<div class="message received">
-  <div class="metadata">
-    <span class="time">{{.FullName}}</span>
-  </div>
-  <span>{{.Message}}</span>
-</div>
-{{end}}
-<!-- if statement -->
-{{end}}
 
-<!-- block -->
+<div class="chat-messages" id="chat-messages">
+  {{ range .Messages }}
+  <!-- if statement -->
+  {{ if eq .SenderId $.UserId}}
+  <div class="message sent">
+    <div class="metadata">
+      <span class="time">Me</span>
+    </div>
+    <span>{{.Message}}</span>
+  </div>
+  {{else}}
+  <div class="message received">
+    <div class="metadata">
+      <span class="time">{{.FullName}}</span>
+    </div>
+    <span>{{.Message}}</span>
+  </div>
+  {{end}}
+  <!-- if statement -->
+  {{end}}
+  <!-- block -->
+</div>
+<div class="chat-input">
+  <input type="text" id="message-input" placeholder="Type a message..." />
+  <button type="button" id="emojiButton" onclick="toggleEmojiPicker()">
+    😊
+  </button>
+  <button id="send-button" onclick="handleSendMessage()">Send</button>
+</div>
 {{end}}

@@ -1,0 +1,29 @@
+{{define "rooms"}}
+<!-- block -->
+{{range .Rooms}}
+<li
+  id="{{.ID}}"
+  class="flex items-center w-full h-[70px] mb-2 p-4 rounded-xl cursor-pointer hover:bg-gray-50"
+  hx-get="messages?room_id={{.ID}}"
+  hx-target="#chat-container"
+  hx-swap="innerHTML"
+  onclick="connectWs(event)"
+>
+  {{if .Avatar}}
+  <img
+    src="{{.Avatar}}"
+    alt="avatar"
+    class="object-cover h-full rounded-full w-10"
+  />
+  {{else}}
+  <div class="avatar placeholder">
+    <div class="bg-neutral text-neutral-content w-10 rounded-full">
+      <span class="text-xs">UNE</span>
+    </div>
+  </div>
+  {{end}}
+  <span class="ml-3 truncate">{{.Name}}</span>
+</li>
+{{end}}
+<!-- block -->
+{{end}}

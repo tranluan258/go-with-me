@@ -36,8 +36,9 @@ func (hh *HomeHandler) GetHomeTemplate(ctx echo.Context) error {
 	}
 
 	return ctx.Render(http.StatusOK, "home.html", map[string]interface{}{
-		"UserId": user.ID,
-		"Avatar": user.Avatar,
-		"Rooms":  rooms,
+		"UserId":   user.ID,
+		"FullName": user.FullName,
+		"Avatar":   user.Avatar,
+		"Rooms":    rooms,
 	})
 }

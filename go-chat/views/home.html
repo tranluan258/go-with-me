@@ -7,7 +7,7 @@
     <div class="chat-app">
       <div class="flex justify-between items-center py-3 pl-5">
         <div class="nav-links">
-          <a>Home</a>
+          <a href="/">Home</a>
         </div>
         <div class="profile-section w-16">
           <div class="profile-icon" id="profileIcon">
@@ -16,13 +16,13 @@
               <img
                 tabindex="0"
                 role="button"
-                class="avatar rounded-full object-cover w-24"
+                class="rounded-full w-24"
                 src="{{.Avatar}}"
                 alt="avatar "
               />
               <ul
                 tabindex="0"
-                class="dropdown-content menu bg-base-100 rounded-box z-[1] w-fit p-2 shadow"
+                class="dropdown-content text-black menu rounded-box z-[1] w-fit p-2"
               >
                 <li><a href="/logout">Logout</a></li>
               </ul>
@@ -30,13 +30,13 @@
             {{else}}
             <div class="dropdown dropdown-end">
               <div class="avatar placeholder" tabindex="0" role="button">
-                <div class="bg-neutral text-neutral-content w-10 rounded-full">
-                  <span class="text-xs">UNE</span>
+                <div class="w-10 rounded-full bg-neutral text-neutral-content">
+                  <span class="text-xs">D</span>
                 </div>
               </div>
               <ul
                 tabindex="0"
-                class="dropdown-content menu bg-base-100 rounded-box z-[1] w-fit p-2 shadow"
+                class="dropdown-content menu rounded-box text-black z-[1] w-fit p-2"
               >
                 <li><a href="/logout">Logout</a></li>
               </ul>
@@ -52,58 +52,39 @@
             {{template "rooms" .}}
           </ul>
         </div>
-        <div class="chat-container">
-          <div class="chat-messages" id="chat-messages">
-            {{template "messages" .}}
+        <div class="chat-container" id="chat-container">
+          {{if .Messages}} {{template "messages" .}} {{else}}
+          <div class="flex justify-center items-center h-full bg-gray-100">
+            <div class="hero">
+              <div class="hero-content flex-col">
+                {{if .Avatar}}
+                <div class="avatar">
+                  <div
+                    class="ring-primary ring-offset-base-100 w-24 rounded-full ring ring-offset-2"
+                  >
+                    <img src="{{.Avatar}}" />
+                  </div>
+                </div>
+                {{else}}
+                <div class="avatar placeholder">
+                  <div
+                    class="bg-neutral text-neutral-content w-24 rounded-full"
+                  >
+                    <span class="text-3xl">D</span>
+                  </div>
+                </div>
+                {{end}}
+                <div>
+                  <h1 class="text-5xl font-bold">Welcome {{.FullName}}</h1>
+                  <p class="py-6"></p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="chat-input">
-            <input
-              type="text"
-              id="message-input"
-              placeholder="Type a message..."
-            />
-            <button
-              type="button"
-              id="emojiButton"
-              onclick="toggleEmojiPicker()"
-            >
-              😊
-            </button>
-            <button id="send-button" onclick="handleSendMessage()">Send</button>
-          </div>
+          {{end}}
         </div>
       </div>
       <div id="toastContainer"></div>
     </div>
   </body>
 </html>
-
-{{define "rooms"}}
-<!-- block -->
-{{range .Rooms}}
-<li
-  id="{{.ID}}"
-  class="flex items-center w-full h-[70px] mb-2 p-4 rounded-xl cursor-pointer hover:bg-gray-50"
-  hx-get="rooms/{{.ID}}"
-  hx-target="#chat-messages"
-  hx-swap="innerHTML"
-  onclick="connectWs(event)"
->
-  {{if .Avatar}}
-  <img
-    src="{{.Avatar}}"
-    alt="avatar"
-    class="object-cover h-full rounded-full w-10"
-  />
-  {{else}}
-  <div class="avatar placeholder">
-    <div class="bg-neutral text-neutral-content w-10 rounded-full">
-      <span class="text-xs">UNE</span>
-    </div>
-  </div>
-  {{end}}
-  <span class="ml-3 truncate">{{.Name}}</span>
-</li>
-{{end}}
-<!-- block -->
-{{end}}

@@ -27,7 +27,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 func Init() {
-	conn := db.InitDb()
+	db := db.InitDb()
 	t := &Template{
 		templates: template.Must(template.ParseGlob("views/*.html")),
 	}
@@ -38,19 +38,20 @@ func Init() {
 	e.Renderer = t
 
 	// NOTE init route
-	intWsRoute(e, conn)
-	initHomeRoute(e, conn)
-	initLoginRoute(e, conn)
-	initRoomRoute(e, conn)
+	intWsRoute(e, db)
+	initHomeRoute(e, db)
+	initLoginRoute(e, db)
+	initRoomRoute(e, db)
+	initMessageRoute(e, db)
 
 	e.Logger.Fatal(e.Start("localhost:8080"))
 }
 
-func intWsRoute(e *echo.Echo, conn *sqlx.DB) {
+func intWsRoute(e *echo.Echo, db *sqlx.DB) {
 	wsHanlder := ws.NewWsHandler()
 
 	e.GET("/ws/:id", MustAuth(func(ctx echo.Context) error {
-		err := wsHanlder.Serve(ctx, conn)
+		err := wsHanlder.Serve(ctx, db)
 		if err != nil {
 			return ctx.String(http.StatusInternalServerError, "server error")
 		}
@@ -58,14 +59,14 @@ func intWsRoute(e *echo.Echo, conn *sqlx.DB) {
 	}))
 }
 
-func initHomeRoute(e *echo.Echo, conn *sqlx.DB) {
-	homeHandler := handlers.NewHomeHandler(conn)
+func initHomeRoute(e *echo.Echo, db *sqlx.DB) {
+	homeHandler := handlers.NewHomeHandler(db)
 
 	e.GET("/", MustAuth(homeHandler.GetHomeTemplate))
 }
 
-func initLoginRoute(e *echo.Echo, conn *sqlx.DB) {
-	loginHandler := handlers.NewLoginHander(conn)
+func initLoginRoute(e *echo.Echo, db *sqlx.DB) {
+	loginHandler := handlers.NewLoginHander(db)
 
 	e.GET("/auth/:provider", loginHandler.BeginAuth)
 	e.GET("/auth/:provider/callback", loginHandler.CompleteAuth)
@@ -74,9 +75,16 @@ func initLoginRoute(e *echo.Echo, conn *sqlx.DB) {
 	e.GET("/logout", loginHandler.Logout)
 }
 
-func initRoomRoute(e *echo.Echo, conn *sqlx.DB) {
-	roomHandler := handlers.NewRoomHandler(conn)
+func initRoomRoute(e *echo.Echo, db *sqlx.DB) {
+	roomHandler := handlers.NewRoomHandler(db)
 
 	e.POST("/rooms", MustAuth(roomHandler.CreateRoom))
-	e.GET("/rooms/:room_id", MustAuth(roomHandler.GetRoomById))
+	// TODO: this api this return detail room
+	// e.GET("/rooms/:room_id", MustAuth(roomHandler.GetRoomById))
+}
+
+func initMessageRoute(e *echo.Echo, db *sqlx.DB) {
+	messageHandler := handlers.NewMessageHandler(db)
+
+	e.GET("/messages", MustAuth(messageHandler.GetMessagesByRoom))
 }
