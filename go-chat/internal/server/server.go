@@ -42,6 +42,7 @@ func Init() {
 	initHomeRoute(e, db)
 	initLoginRoute(e, db)
 	initRoomRoute(e, db)
+	initUserRoute(e, db)
 	initMessageRoute(e, db)
 
 	e.Logger.Fatal(e.Start("localhost:8080"))
@@ -87,4 +88,10 @@ func initMessageRoute(e *echo.Echo, db *sqlx.DB) {
 	messageHandler := handlers.NewMessageHandler(db)
 
 	e.GET("/messages", MustAuth(messageHandler.GetMessagesByRoom))
+}
+
+func initUserRoute(e *echo.Echo, db *sqlx.DB) {
+	userHandler := handlers.NewUserHandler(db)
+
+	e.GET("/users", MustAuth(userHandler.SearchUser))
 }

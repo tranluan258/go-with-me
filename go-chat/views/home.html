@@ -47,7 +47,15 @@
       </div>
       <div class="flex h-full">
         <div class="w-1/5 p-5" id="rooms">
-          <h3 class="font-bold text-lg mb-2">Recent Chats</h3>
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-lg mb-2">Recent Chats</h3>
+            <button
+              class="btn btn-sm btn-primary"
+              onclick="new_chat_modal.showModal()"
+            >
+              New Chat
+            </button>
+          </div>
           <ul class="list-none">
             {{template "rooms" .}}
           </ul>
@@ -85,6 +93,65 @@
         </div>
       </div>
       <div id="toastContainer"></div>
+      <dialog id="new_chat_modal" class="modal">
+        <div class="modal-box bg-white">
+          <div method="dialog" class="w-full flex flex-col">
+            <div class="w-full">
+              <label class="input flex items-center gap-2 bg-white">
+                <input
+                  name="search"
+                  type="text"
+                  class="grow"
+                  placeholder="Search"
+                  hx-get="/users"
+                  hx-trigger="keyup delay:500ms changed, intersect once"
+                  hx-target="#user-list"
+                />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                  class="h-4 w-4 opacity-70"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </label>
+            </div>
+            <div class="w-full mt-5">
+              <ul id="user-list" class="min-h-[100px] max-h-[300px]">
+                {{template "user-list" .}}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </dialog>
     </div>
   </body>
 </html>
+
+{{define "user-list"}}
+<!-- loop -->
+{{range .Users}}
+<li
+  class="flex items-center w-full h-[70px] mb-2 p-4 rounded-xl cursor-pointer hover:bg-gray-50"
+>
+  {{if .Avatar}}
+  <img
+    src="{{.Avatar}}"
+    alt="avatar"
+    class="object-cover h-full rounded-full w-10"
+  />
+  {{else}}
+  <div class="avatar placeholder">
+    <div class="bg-neutral text-neutral-content w-10 rounded-full">
+      <span class="text-xs">UNE</span>
+    </div>
+  </div>
+  {{end}}
+  <span class="ml-3 truncate">{{.FullName}}</span>
+</li>
+{{end}} {{end}}
