@@ -49,12 +49,9 @@
         <div class="w-1/5 p-5" id="rooms">
           <div class="flex justify-between items-center">
             <h3 class="font-bold text-lg mb-2">Recent Chats</h3>
-            <button
-              class="btn btn-sm btn-primary"
-              onclick="new_chat_modal.showModal()"
+            <label for="new_chat_modal" class="btn btn-sm btn-primary"
+              >New chat</label
             >
-              New Chat
-            </button>
           </div>
           <ul class="list-none">
             {{template "rooms" .}}
@@ -93,9 +90,10 @@
         </div>
       </div>
       <div id="toastContainer"></div>
+      <input type="checkbox" id="new_chat_modal" class="modal-toggle" />
       <dialog id="new_chat_modal" class="modal">
         <div class="modal-box bg-white">
-          <div method="dialog" class="w-full flex flex-col">
+          <div class="w-full flex flex-col">
             <div class="w-full">
               <label class="input flex items-center gap-2 bg-white">
                 <input
@@ -104,7 +102,7 @@
                   class="grow"
                   placeholder="Search"
                   hx-get="/users"
-                  hx-trigger="keyup delay:500ms changed, intersect once"
+                  hx-trigger="keyup delay:100ms changed, intersect once"
                   hx-target="#user-list"
                 />
                 <svg
@@ -128,6 +126,7 @@
             </div>
           </div>
         </div>
+        <label class="modal-backdrop" for="new_chat_modal">Close</label>
       </dialog>
     </div>
   </body>
