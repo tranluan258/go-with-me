@@ -80,6 +80,7 @@ func initRoomRoute(e *echo.Echo, db *sqlx.DB) {
 	roomHandler := handlers.NewRoomHandler(db)
 
 	e.POST("/rooms", MustAuth(roomHandler.CreateRoom))
+	e.GET("/rooms/dm-room", MustAuth(roomHandler.GetDMRoom))
 	// TODO: this api this return detail room
 	// e.GET("/rooms/:room_id", MustAuth(roomHandler.GetRoomById))
 }

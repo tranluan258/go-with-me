@@ -32,8 +32,13 @@ func (mh *MessageHandler) GetMessagesByRoom(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
+	// TODO: update query get room detail
 	return ctx.Render(http.StatusOK, "messages", map[string]interface{}{
 		"Messages": messages,
 		"UserId":   cookie.Value,
+		"Room": map[string]interface{}{
+			"ID":   roomId,
+			"Name": "No Name",
+		},
 	})
 }
