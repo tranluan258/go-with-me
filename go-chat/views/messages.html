@@ -2,7 +2,6 @@
 <!-- block -->
 <div class="chat-messages" id="chat-messages">
   <div class="bg-cyan-100 room_id_header" id="{{.Room.ID}}">{{.Room.ID}}</div>
-  <div class="room_created" id="{{.IsCreated}}">{{.IsCreated}}</div>
   {{ range .Messages }}
   <!-- if statement -->
   {{ if eq .SenderId $.UserId}}

@@ -86,13 +86,25 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
      AND r.room_type = 'dm'
      GROUP BY ru1.room_id,r.name`, user2Id, cookie.Value)
 	if err != nil {
-		slog.Error("Empty rooms", "debug", err.Error())
+
+		tx := rh.db.MustBegin()
+
+		var roomId string
+		err = tx.Get(&roomId, "INSERT INTO rooms (name,room_type) VALUES($1,$2) RETURNING id", "Test", "dm")
+		if err != nil {
+			tx.Rollback()
+			return ctx.String(http.StatusInternalServerError, "server error")
+		}
+
+		tx.MustExec("INSERT INTO user_room (user_id, room_id) VALUES($1, $2)", cookie.Value, roomId)
+		tx.MustExec("INSERT INTO user_room (user_id, room_id) VALUES($1, $2)", user2Id, roomId)
+		tx.Commit()
+
 		return ctx.Render(http.StatusOK, "messages", map[string]interface{}{
 			"Messages": []models.Message{},
 			"UserId":   cookie.Value,
 			"Room": map[string]interface{}{
-				"ID":   user2Id,
-				"Name": "No Name",
+				"ID": roomId,
 			},
 		})
 	}

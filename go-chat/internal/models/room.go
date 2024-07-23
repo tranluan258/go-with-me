@@ -8,4 +8,5 @@ type Room struct {
 	Avatar      *string   `json:"avatar" db:"avatar"`
 	ID          string    `json:"id" db:"id"`
 	Name        string    `json:"name" db:"name"`
+	RoomType    string    `json:"room_type" db:"room_type"`
 }

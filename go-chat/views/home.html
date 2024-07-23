@@ -140,7 +140,29 @@
   hx-get="rooms/dm-room?user_id={{.ID}}"
   hx-target="#chat-container"
   hx-swap="innerHTML"
-  hx-on::after-request="document.querySelector('.modal-backdrop').click()"
+  hx-on::after-request="
+document.querySelector('.modal-backdrop').click()
+  const roomId = document.querySelector('.room_id_header')?.id;
+  const newRoom = `
+<li
+  id='${roomId}'
+  class='flex items-center w-full h-[70px] mb-2 p-4 rounded-xl cursor-pointer hover:bg-gray-50'
+  hx-get='messages?room_id={{.ID}}'
+  hx-target='#chat-container'
+  hx-swap='innerHTML'
+  onclick='connectWs(event)'
+>
+  <div class='avatar placeholder'>
+    <div class='bg-neutral text-neutral-content w-10 rounded-full'>
+      <span class='text-xs'>UNE</span>
+    </div>
+  </div>
+  <span class='ml-3 truncate'>Test</span>
+</li>
+`;
+  const listRoom = document.querySelector('.list-room');
+  listRoom?.insertAdjacentHTML('beforebegin', newRoom);
+  "
 >
   {{if .Avatar}}
   <img

@@ -54,16 +54,15 @@ function createMessageElement(msg, isRec, username) {
 /**
  * @description Handle send message websocket
  */
-function handleSendMessage() {
-  const isCreated = document.querySelector(".room_created")?.id;
-
-  if (isCreated === "false") {
-    createNewRoom();
-    return;
-  }
-
+async function handleSendMessage() {
   if (!conn) {
-    return;
+    const roomId = document.querySelector(".room_id_header")?.id;
+    await connectWs({
+      target: {
+        // @ts-ignore
+        id: roomId,
+      },
+    });
   }
 
   /**
@@ -90,22 +89,28 @@ function handleSendMessage() {
  */
 function connectWs(e) {
   if (window["WebSocket"]) {
-    // @ts-ignore
-    const roomId = e.target?.id;
-    const url = "ws://localhost:8080/ws/" + roomId;
-    conn = new WebSocket(url);
-
-    /**
-     * @param {MessageEvent<{data: string}>} evt
-     */
-    conn.onmessage = function (evt) {
-      /**
-       * @type {{full_name: string; msg: string,type?:string}}
-       */
+    return new Promise((resvole, reject) => {
       // @ts-ignore
-      const data = JSON.parse(evt.data);
-      createMessageElement(data.msg, true, data.full_name);
-    };
+      const roomId = e.target?.id;
+      const url = "ws://localhost:8080/ws/" + roomId;
+      conn = new WebSocket(url);
+
+      conn.onopen = () => {
+        resvole(true);
+      };
+
+      /**
+       * @param {MessageEvent<{data: string}>} evt
+       */
+      conn.onmessage = function (evt) {
+        /**
+         * @type {{full_name: string; msg: string,type?:string}}
+         */
+        // @ts-ignore
+        const data = JSON.parse(evt.data);
+        createMessageElement(data.msg, true, data.full_name);
+      };
+    });
   }
 }
 
@@ -147,62 +152,4 @@ function toogleDropdown() {
   if (!dropdownMenu) return;
   dropdownMenu.style.display =
     dropdownMenu.style.display === "block" ? "none" : "block";
-}
-
-function createNewRoom() {
-  /**
-   * @type {HTMLInputElement | null}
-   * */
-  // @ts-ignore
-  const msg = document.getElementById("message-input");
-  if (!msg) return;
-
-  if (!msg.value) return;
-
-  createMessageElement(msg.value, false);
-
-  const userId = document.querySelector(".room_id_header")?.id;
-
-  fetch("/rooms", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      room_name: "1",
-      room_type: "dm",
-      user_ids: [userId],
-      first_message: msg.value,
-    }),
-  })
-    .then((res) => res.json())
-    .then((json) => {
-      const { room_id, room_name } = json;
-      const isCreated = document.querySelector(".room_created");
-      if (isCreated) {
-        isCreated.id = "true";
-      }
-
-      connectWs(room_id);
-      const newRoom = `
-<li
-  id="${room_id}"
-  class="flex items-center w-full h-[70px] mb-2 p-4 rounded-xl cursor-pointer hover:bg-gray-50"
-  hx-get="messages?room_id={{.ID}}"
-  hx-target="#chat-container"
-  hx-swap="innerHTML"
-  onclick="connectWs(event)"
->
-  <div class="avatar placeholder">
-    <div class="bg-neutral text-neutral-content w-10 rounded-full">
-      <span class="text-xs">UNE</span>
-    </div>
-  </div>
-  <span class="ml-3 truncate">${room_name}</span>
-</li>
-`;
-
-      const listRoom = document.querySelector(".list-room");
-      listRoom?.insertAdjacentHTML("beforebegin", newRoom);
-    });
 }
