@@ -1,7 +1,7 @@
 package stack
 
 type StackNode struct {
-	next  *StackNode
+	prev  *StackNode
 	value int
 }
 
@@ -10,40 +10,38 @@ type Stack struct {
 	length int
 }
 
-func (q *Stack) Pop() int {
-	if q.head == nil {
+func (s *Stack) Pop() int {
+	if s.head == nil {
 		return -1
 	}
 
-	q.length--
-	head := q.head
-	q.head = head.next
-	head.next = nil
+	s.length--
+	head := s.head
+	s.head = head.prev
+	head.prev = nil
 	return head.value
 }
 
-func (q *Stack) Push(val int) {
-	node := &StackNode{value: val, next: nil}
+func (s *Stack) Push(val int) {
+	node := &StackNode{value: val, prev: nil}
 
-	if q.head == nil {
-		q.head = node
-		q.length++
+	s.length++
+	if s.head == nil {
+		s.head = node
 		return
 	}
 
-	head := q.head
-	q.head = node
-	q.head.next = head
-	q.length++
+	node.prev = s.head
+	s.head = node
 }
 
-func (q *Stack) Peek() int {
-	if q.head == nil {
+func (s *Stack) Peek() int {
+	if s.head == nil {
 		return -1
 	}
-	return q.head.value
+	return s.head.value
 }
 
-func (q *Stack) Size() int {
-	return q.length
+func (s *Stack) Size() int {
+	return s.length
 }
