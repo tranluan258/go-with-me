@@ -5,6 +5,7 @@ type Point struct {
 	y int
 }
 
+// direction top,right,bottom,left
 var direction [][]int = [][]int{
 	{0, -1},
 	{0, 1},
@@ -31,7 +32,7 @@ func walk(maze [][]string, wall string, curr Point, end Point, path *[]Point, se
 		return true
 	}
 
-	// if seed = true
+	// if seen  = true
 	if seen[curr.y][curr.x] {
 		return false
 	}
