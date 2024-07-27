@@ -1,9 +1,9 @@
 .chat-app {
   display: flex;
   max-width: 2000px;
-  max-height: 900px;
+  max-height: 90vh;
   width: 1500px;
-  height: 750px;
+  height: 1200px;
   background: white;
   border-radius: 10px;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
@@ -29,7 +29,6 @@
   flex: 1;
   padding: 20px;
   overflow-y: auto;
-  background: #f4f4f9;
   border-bottom: 1px solid #ddd;
   display: flex;
   flex-direction: column;

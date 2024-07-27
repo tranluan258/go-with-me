@@ -1,7 +1,23 @@
 {{define "messages"}}
 <!-- block -->
+<div class="top-0 z-10 p-2 flex border border-gray-100 items-center">
+  {{if .Room.Avatar}}
+  <img
+    src="{{.Room.Avatar}}"
+    alt="avatar"
+    class="object-cover h-full rounded-full w-10 mr-3"
+    id="room-avatar"
+  />
+  {{else}}
+  <div class="avatar placeholder mr-3">
+    <div class="w-10 rounded-full">
+      <span class="text-xs">UNE</span>
+    </div>
+  </div>
+  {{end}}
+  <div class="room_id_header" id="{{.Room.ID}}">{{.Room.Name}}</div>
+</div>
 <div class="chat-messages" id="chat-messages">
-  <div class="bg-cyan-100 room_id_header" id="{{.Room.ID}}">{{.Room.ID}}</div>
   {{ range .Messages }}
   <!-- if statement -->
   {{ if eq .SenderId $.UserId}}

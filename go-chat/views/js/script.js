@@ -158,7 +158,9 @@ function prependNewRoom() {
   // @ts-ignore
   document.querySelector(".modal-backdrop")?.click();
   const listRoom = document.querySelector(".list-room");
-  const roomId = document.querySelector(".room_id_header")?.id;
+  const room = document.querySelector(".room_id_header");
+  const roomId = room?.id;
+  const roomName = room?.innerHTML;
   let isExisted = false;
 
   listRoom?.childNodes.forEach((node) => {
@@ -177,14 +179,13 @@ function prependNewRoom() {
   hx-get='messages?room_id={{.ID}}'
   hx-target='#chat-container'
   hx-swap='innerHTML'
-  onclick='connectWs(event)'
 >
   <div class='avatar placeholder'>
     <div class='bg-neutral text-neutral-content w-10 rounded-full'>
       <span class='text-xs'>UNE</span>
     </div>
   </div>
-  <span class='ml-3 truncate'>Test</span>
+  <span class='ml-3 truncate'>${roomName}</span>
 </li>
 `;
   listRoom?.insertAdjacentHTML("beforebegin", newRoom);

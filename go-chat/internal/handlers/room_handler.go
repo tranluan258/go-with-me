@@ -86,7 +86,6 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
      AND r.room_type = 'dm'
      GROUP BY ru1.room_id,r.name`, user2Id, cookie.Value)
 	if err != nil {
-
 		tx := rh.db.MustBegin()
 
 		var roomId string
@@ -100,12 +99,31 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
 		tx.MustExec("INSERT INTO user_room (user_id, room_id) VALUES($1, $2)", user2Id, roomId)
 		tx.Commit()
 
+		var room models.Room
+		rh.db.Get(&room, `
+      SELECT 
+          r.id AS id,
+          CASE
+              WHEN r.room_type = 'dm' THEN (SELECT u.full_name FROM users u JOIN user_room ru ON u.id = ru.user_id WHERE ru.room_id = r.id AND u.id != $1)
+              ELSE r.name
+              END AS name,
+          CASE
+              WHEN r.room_type = 'dm' THEN (SELECT u.avatar FROM users u JOIN user_room ru ON u.id = ru.user_id WHERE ru.room_id = r.id AND u.id != $1)
+              ELSE NULL
+              END AS avatar,
+          r.room_type
+      FROM 
+          rooms r
+      JOIN 
+          user_room ru1 ON r.id = ru1.room_id
+      AND 
+          r.id=$2;
+      `, cookie.Value, roomId)
+
 		return ctx.Render(http.StatusOK, "messages", map[string]interface{}{
 			"Messages": []models.Message{},
 			"UserId":   cookie.Value,
-			"Room": map[string]interface{}{
-				"ID": roomId,
-			},
+			"Room":     room,
 		})
 	}
 
