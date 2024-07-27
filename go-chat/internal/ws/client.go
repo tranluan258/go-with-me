@@ -17,7 +17,7 @@ type message struct {
 
 type client struct {
 	socket   *websocket.Conn
-	send     chan message
+	send     chan []byte
 	room     *room
 	conn     *sqlx.DB
 	clientId string
@@ -47,8 +47,7 @@ func (c *client) write() {
 	defer c.socket.Close()
 
 	for message := range c.send {
-		data, _ := json.Marshal(message)
-		err := c.socket.WriteMessage(websocket.TextMessage, data)
+		err := c.socket.WriteMessage(websocket.TextMessage, message)
 		if err != nil {
 			return
 		}

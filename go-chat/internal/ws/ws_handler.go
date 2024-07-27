@@ -59,7 +59,7 @@ func (ws *WsHandler) Serve(c echo.Context, conn *sqlx.DB) error {
 		clientId: clientId.Value,
 		fullName: fullName.Value,
 		socket:   socket,
-		send:     make(chan message),
+		send:     make(chan []byte),
 		room:     room,
 		conn:     conn,
 	}

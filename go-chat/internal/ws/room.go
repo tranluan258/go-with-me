@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -37,36 +38,31 @@ func (r *room) run() {
 			log.Println("new message from ", msg.FullName)
 			for client := range r.clients {
 				if msg.SenderId != r.clients[client].clientId {
-					r.clients[client].send <- msg
+					message := fmt.Sprintf(`
+            <div id="chat-messages" class="chat-messages" hx-swap-oob="beforeend:#chat-messages">
+               <div class="message received">
+                 <div class="metadata">
+                 <span class="time">%s</span>
+                 </div>
+                 <span>%s</span>
+               </div>
+            </div>
+               `, msg.FullName, msg.Msg)
+					r.clients[client].send <- []byte(message)
+				} else {
+					message := fmt.Sprintf(`
+            <div id="chat-messages" class="chat-messages" hx-swap-oob="beforeend:#chat-messages">
+               <div class="message sent">
+                 <div class="metadata">
+                 <span class="time">%s</span>
+                 </div>
+                 <span>%s</span>
+               </div>
+            </div>
+               `, "Me", msg.Msg)
+					r.clients[client].send <- []byte(message)
 				}
 			}
-		}
-	}
-}
-
-func (r *room) sendJoinedOrLeft(client *client, event string) {
-	msg := message{
-		SenderId: client.clientId,
-		FullName: client.fullName,
-		Msg:      client.fullName + " " + event,
-		Type:     event,
-	}
-	for clientId := range r.clients {
-		if clientId != client.clientId {
-			r.clients[clientId].send <- msg
-		}
-	}
-}
-
-func (r *room) sendCurrUserForNewUser(newClient *client) {
-	for client := range r.clients {
-		if client != newClient.clientId {
-			msg := message{
-				SenderId: r.clients[client].clientId,
-				FullName: r.clients[client].fullName,
-				Type:     "user-list",
-			}
-			newClient.send <- msg
 		}
 	}
 }

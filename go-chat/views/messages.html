@@ -17,33 +17,40 @@
   {{end}}
   <div class="room_id_header" id="{{.Room.ID}}">{{.Room.Name}}</div>
 </div>
-<div class="chat-messages" id="chat-messages">
-  {{ range .Messages }}
-  <!-- if statement -->
-  {{ if eq .SenderId $.UserId}}
-  <div class="message sent">
-    <div class="metadata">
-      <span class="time">Me</span>
+<div hx-ext="ws" ws-connect="/ws/{{.Room.ID}}" class="flex flex-col flex-1">
+  <div id="chat-messages" class="chat-messages">
+    {{ range .Messages }}
+    <!-- if statement -->
+    {{ if eq .SenderId $.UserId}}
+    <div class="message sent">
+      <div class="metadata">
+        <span class="time">Me</span>
+      </div>
+      <span>{{.Message}}</span>
     </div>
-    <span>{{.Message}}</span>
-  </div>
-  {{else}}
-  <div class="message received">
-    <div class="metadata">
-      <span class="time">{{.FullName}}</span>
+    {{else}}
+    <div class="message received">
+      <div class="metadata">
+        <span class="time">{{.FullName}}</span>
+      </div>
+      <span>{{.Message}}</span>
     </div>
-    <span>{{.Message}}</span>
+    {{end}}
+    <!-- if statement -->
+    {{end}}
+    <!-- block -->
   </div>
-  {{end}}
-  <!-- if statement -->
-  {{end}}
-  <!-- block -->
-</div>
-<div class="chat-input">
-  <input type="text" id="message-input" placeholder="Type a message..." />
-  <button type="button" id="emojiButton" onclick="toggleEmojiPicker()">
-    😊
-  </button>
-  <button id="send-button" onclick="handleSendMessage()">Send</button>
+  <form class="chat-input" ws-send>
+    <input
+      type="text"
+      name="msg"
+      id="message-input"
+      placeholder="Type a message..."
+    />
+    <button type="button" id="emojiButton" onclick="toggleEmojiPicker()">
+      😊
+    </button>
+    <button id="send-button">Send</button>
+  </form>
 </div>
 {{end}}

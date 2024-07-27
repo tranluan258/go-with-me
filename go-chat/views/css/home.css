@@ -15,7 +15,6 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  max-height: 80vh;
 }
 
 .chat-header {
@@ -32,6 +31,7 @@
   border-bottom: 1px solid #ddd;
   display: flex;
   flex-direction: column;
+  justify-content: end;
 }
 
 .chat-messages .message {
