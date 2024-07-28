@@ -7,6 +7,7 @@
       hx-post="/register"
       hx-target="#error"
       hx-swap="outerHTML"
+      hx-encoding="multipart/form-data"
     >
       <h2 class="title">Register</h2>
       <div class="input-group pb-3">
@@ -20,6 +21,10 @@
       <div class="input-group pb-3">
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required />
+      </div>
+      <div class="input-group pb-3">
+        <label for="avatar">Avatar</label>
+        <input type="file" id="avatar" name="avatar" accept=".jpeg,.png,.jpg" />
       </div>
       <button type="submit" class="login-button">Register</button>
       <div class="flex justify-center pt-3">

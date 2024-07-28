@@ -1,6 +1,7 @@
 package server
 
 import (
+	"go-chat/internal/config"
 	"go-chat/internal/db"
 	"go-chat/internal/handlers"
 	"go-chat/internal/ws"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"text/template"
 
+	"cloud.google.com/go/storage"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 )
@@ -28,6 +30,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 
 func Init() {
 	db := db.InitDb()
+	bucket := config.FirebaseConfig()
 	t := &Template{
 		templates: template.Must(template.ParseGlob("views/*.html")),
 	}
@@ -40,7 +43,7 @@ func Init() {
 	// NOTE init route
 	intWsRoute(e, db)
 	initHomeRoute(e, db)
-	initLoginRoute(e, db)
+	initAuthRoute(e, db, bucket)
 	initRoomRoute(e, db)
 	initUserRoute(e, db)
 	initMessageRoute(e, db)
@@ -66,8 +69,8 @@ func initHomeRoute(e *echo.Echo, db *sqlx.DB) {
 	e.GET("/", MustAuth(homeHandler.GetHomeTemplate))
 }
 
-func initLoginRoute(e *echo.Echo, db *sqlx.DB) {
-	loginHandler := handlers.NewLoginHander(db)
+func initAuthRoute(e *echo.Echo, db *sqlx.DB, bucket *storage.BucketHandle) {
+	loginHandler := handlers.NewLoginHander(db, bucket)
 
 	e.GET("/auth/:provider", loginHandler.BeginAuth)
 	e.GET("/auth/:provider/callback", loginHandler.CompleteAuth)

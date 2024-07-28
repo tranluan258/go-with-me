@@ -1,12 +1,16 @@
 package handlers
 
 import (
+	"context"
 	"go-chat/internal/models"
+	"io"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
+	"cloud.google.com/go/storage"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 	"github.com/markbates/goth/gothic"
@@ -18,12 +22,14 @@ const (
 )
 
 type AuthHander struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	bucket *storage.BucketHandle
 }
 
-func NewLoginHander(db *sqlx.DB) *AuthHander {
+func NewLoginHander(db *sqlx.DB, bucket *storage.BucketHandle) *AuthHander {
 	return &AuthHander{
-		db: db,
+		db:     db,
+		bucket: bucket,
 	}
 }
 
@@ -121,22 +127,58 @@ func (ah *AuthHander) RegisterGet(ctx echo.Context) error {
 }
 
 func (ah *AuthHander) RegisterPost(ctx echo.Context) error {
-	var register models.Register
-	err := ctx.Bind(&register)
-	if err != nil {
-		return ctx.String(http.StatusBadRequest, "bad request")
-	}
-	var username string
-	empty := ah.db.Get(&username, "SELECT username FROM users WHERE username=$1", register.Username)
+	var avatar *string = nil
+	username := ctx.FormValue("username")
+	password := ctx.FormValue("password")
+	fullname := ctx.FormValue("fullname")
 
+	file, err := ctx.FormFile("avatar")
+	if err == nil {
+		func() {
+			src, err := file.Open()
+			if err != nil {
+				slog.Error("Upload failed", "error", err.Error())
+				return
+			}
+			defer src.Close()
+
+			// Destination
+			t := time.Now()
+
+			docName := t.Format("20060102150405") + file.Filename
+			wc := ah.bucket.Object(docName).NewWriter(context.Background())
+			if _, err = io.Copy(wc, src); err != nil {
+				slog.Error("Upload failed", "error", err.Error())
+				return
+			}
+			err = wc.Close()
+			if err != nil {
+				slog.Error("Upload failed", "error", err.Error())
+				return
+			}
+			url, err := ah.bucket.SignedURL(docName, &storage.SignedURLOptions{
+				Method:  "GET",
+				Expires: time.Now().AddDate(0, 0, 7),
+			})
+			if err != nil {
+				slog.Error("Get url failed", "error", err.Error())
+				return
+			}
+			avatar = &url
+		}()
+	}
+
+	var usernameExisted string
+	empty := ah.db.Get(&usernameExisted, "SELECT username FROM users WHERE username=$1", username)
 	if empty == nil {
 		return ctx.Render(http.StatusBadRequest, "errors", map[string]interface{}{
 			"Errors": "User already existed",
 		})
 	}
 
-	_, err = ah.db.Exec("INSERT INTO users(username,password,full_name) VALUES($1,$2,$3)", register.Username, register.Password, register.FullName)
+	_, err = ah.db.Exec("INSERT INTO users(username,password,full_name,avatar) VALUES($1,$2,$3, $4)", username, password, fullname, avatar)
 	if err != nil {
+		slog.Error("Insert failed", "error", err.Error())
 		return ctx.Render(http.StatusBadRequest, "errors", map[string]interface{}{
 			"Errors": "Register failed",
 		})
