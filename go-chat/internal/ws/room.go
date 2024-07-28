@@ -38,28 +38,10 @@ func (r *room) run() {
 			log.Println("new message from ", msg.FullName)
 			for client := range r.clients {
 				if msg.SenderId != r.clients[client].clientId {
-					message := fmt.Sprintf(`
-            <div id="chat-messages" class="chat-messages" hx-swap-oob="beforeend:#chat-messages">
-               <div class="message received">
-                 <div class="metadata">
-                 <span class="time">%s</span>
-                 </div>
-                 <span>%s</span>
-               </div>
-            </div>
-               `, msg.FullName, msg.Msg)
+					message := fmt.Sprintf(`<div id="chat-messages" class="chat-messages" hx-swap-oob="beforeend:#chat-messages"> <div class="message received"> <div class="metadata"> <span class="time">%s</span> </div> <span>%s</span> </div> </div> `, msg.FullName, msg.Msg)
 					r.clients[client].send <- []byte(message)
 				} else {
-					message := fmt.Sprintf(`
-            <div id="chat-messages" class="chat-messages" hx-swap-oob="beforeend:#chat-messages">
-               <div class="message sent">
-                 <div class="metadata">
-                 <span class="time">%s</span>
-                 </div>
-                 <span>%s</span>
-               </div>
-            </div>
-               `, "Me", msg.Msg)
+					message := fmt.Sprintf(`<div id="chat-messages" class="chat-messages" hx-swap-oob="beforeend:#chat-messages"><div class="message sent"><div class="metadata"><span class="time">%s</span> </div><span>%s</span></div></div>`, "Me", msg.Msg)
 					r.clients[client].send <- []byte(message)
 				}
 			}
