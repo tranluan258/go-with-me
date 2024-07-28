@@ -7,8 +7,8 @@
       <form
         class="login-form"
         hx-post="/login"
+        hx-target="#error"
         hx-swap="outerHTML"
-        hx-target="body"
       >
         <h2 class="title">Gigaga Chat</h2>
         <div class="input-group">
@@ -49,12 +49,6 @@
         </div>
       </form>
     </div>
-    {{if .Errors}}
-    <div class="toast show toast-start z-50 left-1 bottom-2">
-      <div class="alert alert-error">
-        <span>{{.Errors}}</span>
-      </div>
-    </div>
-    {{end}}
+    {{template "errors" .}}
   </body>
 </html>

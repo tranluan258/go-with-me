@@ -39,10 +39,8 @@ func (ah *AuthHander) PostLogin(ctx echo.Context) error {
 
 	err = ah.db.Get(&user, "SELECT id,username,password,full_name,avatar FROM users WHERE username=$1 and password=$2", login.Username, login.Password)
 	if err != nil {
-		return ctx.Render(http.StatusUnauthorized, "login.html", map[string]interface{}{
-			"Errors":   "Invalid credentials",
-			"Username": login.Username,
-			"Password": login.Password,
+		return ctx.Render(http.StatusUnauthorized, "errors", map[string]interface{}{
+			"Errors": "Invalid credentials",
 		})
 	}
 	ah.SetCookie(ctx, user.FullName, user.ID)
