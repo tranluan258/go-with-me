@@ -27,7 +27,7 @@ func NewLoginHander(db *sqlx.DB) *AuthHander {
 	}
 }
 
-func (ah *AuthHander) PostLogin(ctx echo.Context) error {
+func (ah *AuthHander) LoginPost(ctx echo.Context) error {
 	var login models.Login
 
 	err := ctx.Bind(&login)
@@ -114,6 +114,36 @@ func (ah *AuthHander) CompleteAuth(ctx echo.Context) error {
 
 	ah.SetCookie(ctx, existedUser.FullName, existedUser.ID)
 	return ctx.Redirect(http.StatusTemporaryRedirect, "/")
+}
+
+func (ah *AuthHander) RegisterGet(ctx echo.Context) error {
+	return ctx.Render(http.StatusOK, "register.html", nil)
+}
+
+func (ah *AuthHander) RegisterPost(ctx echo.Context) error {
+	var register models.Register
+	err := ctx.Bind(&register)
+	if err != nil {
+		return ctx.String(http.StatusBadRequest, "bad request")
+	}
+	var username string
+	empty := ah.db.Get(&username, "SELECT username FROM users WHERE username=$1", register.Username)
+
+	if empty == nil {
+		return ctx.Render(http.StatusBadRequest, "errors", map[string]interface{}{
+			"Errors": "User already existed",
+		})
+	}
+
+	_, err = ah.db.Exec("INSERT INTO users(username,password,full_name) VALUES($1,$2,$3)", register.Username, register.Password, register.FullName)
+	if err != nil {
+		return ctx.Render(http.StatusBadRequest, "errors", map[string]interface{}{
+			"Errors": "Register failed",
+		})
+	}
+
+	ctx.Response().Header().Add("HX-Redirect", "/login")
+	return ctx.String(http.StatusFound, "register success")
 }
 
 func (ah *AuthHander) SetCookie(ctx echo.Context, fullName, userId string) {

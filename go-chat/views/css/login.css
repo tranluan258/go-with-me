@@ -19,7 +19,6 @@
 }
 
 .input-group {
-  margin-bottom: 20px;
   text-align: left;
 }
 
@@ -60,21 +59,6 @@
 
 .login-button:hover {
   background: #3b52a1;
-}
-
-.forgot-password {
-  margin-top: 20px;
-  font-size: 0.9em;
-  color: #666;
-}
-
-.forgot-password a {
-  color: #4c68d7;
-  text-decoration: none;
-}
-
-.forgot-password a:hover {
-  text-decoration: underline;
 }
 
 .social-login {

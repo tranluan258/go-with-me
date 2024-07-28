@@ -7,17 +7,12 @@
   <script src="js/htmx.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
   <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
-  <link
-    href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
-    rel="stylesheet"
-    type="text/css"
-  />
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/index.css" />
+  <link rel="stylesheet" href="css/output.css" />
   <script type="application/javascript">
     window.onload = () => {
       document.body.addEventListener("htmx:beforeOnLoad", function (evt) {
-        if (evt.detail.xhr.status === 401) {
+        if (evt.detail.xhr.status >= 400) {
           evt.detail.shouldSwap = true;
           evt.detail.isError = false;
         }

@@ -5,6 +5,12 @@ type Login struct {
 	Password string `json:"password"`
 }
 
+type Register struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	FullName string `json:"fullname"`
+}
+
 type User struct {
 	Avatar   *string `json:"avatar" db:"avatar"`
 	ID       string  `json:"id" db:"id"`

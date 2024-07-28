@@ -9,6 +9,8 @@
 *.dylib
 
 tmp/
+node_modules/
+views/css/output.css
 
 # Test binary, built with `go test -c`
 *.test

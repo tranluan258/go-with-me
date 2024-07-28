@@ -1,0 +1,31 @@
+{{template "layout" .}}
+<link rel="stylesheet" href="css/login.css" />
+<body>
+  <div class="login-container">
+    <form
+      class="login-form"
+      hx-post="/register"
+      hx-target="#error"
+      hx-swap="outerHTML"
+    >
+      <h2 class="title">Register</h2>
+      <div class="input-group pb-3">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required />
+      </div>
+      <div class="input-group pb-3">
+        <label for="full_name">Full Name</label>
+        <input type="text" id="full_name" name="fullname" required />
+      </div>
+      <div class="input-group pb-3">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required />
+      </div>
+      <button type="submit" class="login-button">Register</button>
+      <div class="flex justify-center pt-3">
+        <a href="/login" class="text-blue-800 ml-1">Back to login</a>
+      </div>
+    </form>
+  </div>
+  {{template "errors" .}}
+</body>

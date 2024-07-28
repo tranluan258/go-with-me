@@ -1,54 +1,41 @@
-<!doctype html>
-<html lang="en">
-  {{template "layout" .}}
-  <link rel="stylesheet" href="css/login.css" />
-  <body>
-    <div class="login-container">
-      <form
-        class="login-form"
-        hx-post="/login"
-        hx-target="#error"
-        hx-swap="outerHTML"
-      >
-        <h2 class="title">Gigaga Chat</h2>
-        <div class="input-group">
-          <label for="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            {{if
-            .Username}}
-            value="{{.Username}}"
-            {{end}}
-            required
-          />
-        </div>
-        <div class="input-group">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            {{if
-            .Password}}
-            value="{{.Password}}"
-            {{end}}
-            required
-          />
-        </div>
-        <button type="submit" class="login-button">Login</button>
-        <p class="forgot-password"><a href="#">Forgot your password?</a></p>
-        <div class="social-login">
-          <a href="{{.GoogleUrl}}" class="google-button">
-            <img src="assets/google_icon.svg" alt="Google icon" />
-          </a>
-          <a href="{{.FacebookUrl}}" class="facebook-button">
-            <img src="assets/facebook_icon.svg" alt="Facebook icon" />
-          </a>
-        </div>
-      </form>
-    </div>
-    {{template "errors" .}}
-  </body>
-</html>
+{{template "layout" .}}
+<link rel="stylesheet" href="css/login.css" />
+<body>
+  <div class="login-container">
+    <form
+      class="login-form"
+      hx-post="/login"
+      hx-target="#error"
+      hx-swap="outerHTML"
+    >
+      <h2 class="title">Gigaga Chat</h2>
+      <div class="input-group pb-3">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required />
+      </div>
+      <div class="input-group pb-3">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required />
+      </div>
+      <div class="flex justify-end pb-3">
+        <p class="forgot-password text-blue-800 text-base">
+          <a href="/forgot-password">Forgot password?</a>
+        </p>
+      </div>
+      <button type="submit" class="login-button">Login</button>
+      <div class="flex justify-center pt-3">
+        <span>No account?</span>
+        <a href="/register" class="text-blue-800 ml-1">Register now</a>
+      </div>
+      <div class="social-login">
+        <a href="{{.GoogleUrl}}" class="google-button">
+          <img src="assets/google_icon.svg" alt="Google icon" />
+        </a>
+        <a href="{{.FacebookUrl}}" class="facebook-button">
+          <img src="assets/facebook_icon.svg" alt="Facebook icon" />
+        </a>
+      </div>
+    </form>
+  </div>
+  {{template "errors" .}}
+</body>

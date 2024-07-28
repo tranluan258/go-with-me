@@ -71,8 +71,10 @@ func initLoginRoute(e *echo.Echo, db *sqlx.DB) {
 
 	e.GET("/auth/:provider", loginHandler.BeginAuth)
 	e.GET("/auth/:provider/callback", loginHandler.CompleteAuth)
+	e.GET("/register", loginHandler.RegisterGet)
+	e.POST("/register", loginHandler.RegisterPost)
 	e.GET("/login", loginHandler.LoginGet)
-	e.POST("/login", loginHandler.PostLogin)
+	e.POST("/login", loginHandler.LoginPost)
 	e.GET("/logout", loginHandler.Logout)
 }
 
