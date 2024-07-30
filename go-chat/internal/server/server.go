@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"go-chat/internal/config"
 	"go-chat/internal/db"
 	"go-chat/internal/handlers"
@@ -9,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"text/template"
+	"time"
 
 	"cloud.google.com/go/storage"
 	"github.com/jmoiron/sqlx"
@@ -32,7 +34,7 @@ func Init() {
 	db := db.InitDb()
 	bucket := config.FirebaseConfig()
 	t := &Template{
-		templates: template.Must(template.ParseGlob("views/*.html")),
+		templates: template.Must(template.New("base").Funcs(template.FuncMap{"timeAgo": timeAgo}).ParseGlob("views/*.html")),
 	}
 
 	e := echo.New()
@@ -100,4 +102,22 @@ func initUserRoute(e *echo.Echo, db *sqlx.DB) {
 	userHandler := handlers.NewUserHandler(db)
 
 	e.GET("/users", MustAuth(userHandler.SearchUser))
+}
+
+func timeAgo(t time.Time) string {
+	duration := time.Since(t)
+	switch {
+	case duration.Hours() >= 24:
+		days := int(duration.Hours() / 24)
+		return fmt.Sprintf("%d days ago", days)
+	case duration.Hours() >= 1:
+		hours := int(duration.Hours())
+		return fmt.Sprintf("%d hours ago", hours)
+	case duration.Minutes() >= 1:
+		minutes := int(duration.Minutes())
+		return fmt.Sprintf("%d minutes ago", minutes)
+	default:
+		seconds := int(duration.Seconds())
+		return fmt.Sprintf("%d seconds ago", seconds)
+	}
 }

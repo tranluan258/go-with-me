@@ -22,18 +22,20 @@
     {{ range .Messages }}
     <!-- if statement -->
     {{ if eq .SenderId $.UserId}}
-    <div class="message sent">
-      <div class="metadata">
-        <span class="time">Me</span>
+    <div class="chat chat-end">
+      <div class="chat-header">
+        Me
+        <time class="text-xs opacity-50">{{ .CreatedTime | timeAgo }}</time>
       </div>
-      <span>{{.Message}}</span>
+      <div class="chat-bubble chat-bubble-accent">{{.Message}}</div>
     </div>
     {{else}}
-    <div class="message received">
-      <div class="metadata">
-        <span class="time">{{.FullName}}</span>
+    <div class="chat chat-start">
+      <div class="chat-header">
+        {{.FullName}}
+        <time class="text-xs opacity-50">{{ .CreatedTime | timeAgo}}</time>
       </div>
-      <span>{{.Message}}</span>
+      <div class="chat-bubble chat-bubble-primary">{{.Message}}</div>
     </div>
     {{end}}
     <!-- if statement -->
