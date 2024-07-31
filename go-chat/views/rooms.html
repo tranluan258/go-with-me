@@ -3,17 +3,13 @@
 {{range .Rooms}}
 <li
   id="{{.ID}}"
-  class="flex items-center w-full h-[70px] mb-2 p-4 rounded-xl cursor-pointer hover:bg-gray-50"
+  class="flex items-center w-full h-14 mt-3 p-1 rounded-xl cursor-pointer hover:bg-gray-50"
   hx-get="messages?room_id={{.ID}}"
   hx-target="#chat-container"
   hx-swap="innerHTML"
 >
   {{if .Avatar}}
-  <img
-    src="{{.Avatar}}"
-    alt="avatar"
-    class="object-cover h-full rounded-full w-10"
-  />
+  <img src="{{.Avatar}}" alt="avatar" class="object-cover rounded-full w-10" />
   {{else}}
   <div class="avatar placeholder">
     <div class="bg-neutral text-neutral-content w-10 rounded-full">
