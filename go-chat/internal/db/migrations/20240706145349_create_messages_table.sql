@@ -5,7 +5,7 @@ CREATE TABLE messages (
   sender_id VARCHAR(255) NOT NULL,
   full_name VARCHAR(255) NOT NULL,
   message VARCHAR(255) NOT NULL,
-  created_time timestamp default 'now()',
+  created_time timestamp default current_timestamp,
   updated_time  timestamp,
   PRIMARY KEY (id)
 );

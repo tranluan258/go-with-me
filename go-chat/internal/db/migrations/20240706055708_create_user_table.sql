@@ -6,7 +6,7 @@ CREATE TABLE users (
   password VARCHAR(255),
   full_name VARCHAR(255) NOT NULL,
   avatar VARCHAR(255),
-  created_time timestamp default 'now()',
+  created_time timestamp default current_timestamp,
   updated_time timestamp,
   PRIMARY KEY (id)
 );
