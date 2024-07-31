@@ -28,7 +28,7 @@ func (mh *MessageHandler) GetMessagesByRoom(ctx echo.Context) error {
 
 	var messages []models.Message
 
-	err := mh.db.Select(&messages, "SELECT id,message,sender_id,full_name,created_time FROM messages WHERE room_id=$1 ORDER BY created_time DESC", roomId)
+	err := mh.db.Select(&messages, "SELECT id,message,sender_id,full_name,created_time FROM messages WHERE room_id=$1 ORDER BY created_time ASC", roomId)
 	if err != nil {
 		return err
 	}
@@ -57,6 +57,7 @@ func (mh *MessageHandler) GetMessagesByRoom(ctx echo.Context) error {
       AND 
           r.id=$2;
       `, cookie.Value, roomId)
+	ctx.Response().Header().Set("Vary", "HX-Request")
 	return ctx.Render(http.StatusOK, "messages", map[string]interface{}{
 		"Messages": messages,
 		"UserId":   cookie.Value,
