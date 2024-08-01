@@ -96,3 +96,18 @@ func (l *linkedlist) Remove(val int) {
 		curr = curr.next
 	}
 }
+
+func (l *linkedlist) Reverse() {
+	var prev *node = nil
+	var next *node = nil
+	curr := l.head
+
+	for curr != nil {
+		next = curr.next
+		curr.next = prev
+
+		prev = curr
+		curr = next
+	}
+	l.head = prev
+}
