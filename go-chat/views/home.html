@@ -49,11 +49,14 @@
         <div class="w-1/5 p-5 border border-gray-100" id="rooms">
           <div class="flex justify-between items-center">
             <h3 class="font-bold text-lg mb-2">Recent Chats</h3>
-            <label for="new_chat_modal" class="btn btn-sm btn-primary"
-              >New chat</label
+            <button
+              class="btn btn-sm btn-primary"
+              onclick="new_chat_modal.showModal()"
             >
+              New chat
+            </button>
           </div>
-          <ul class="list-none list-room">
+          <ul class="list-none" id="rooms">
             {{template "rooms" .}}
           </ul>
         </div>
@@ -90,21 +93,11 @@
         </div>
       </div>
       <div id="toastContainer"></div>
-      <input type="checkbox" id="new_chat_modal" class="modal-toggle" />
       <dialog id="new_chat_modal" class="modal">
         <div class="modal-box bg-white">
           <div class="w-full flex flex-col">
             <div class="w-full">
-              <label class="input flex items-center gap-2 bg-white">
-                <input
-                  name="search"
-                  type="text"
-                  class="grow"
-                  placeholder="Search"
-                  hx-get="/users"
-                  hx-trigger="keyup delay:100ms changed"
-                  hx-target="#user-list"
-                />
+              <label class="input input-bordered flex items-center gap-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 16 16"
@@ -117,16 +110,39 @@
                     clip-rule="evenodd"
                   />
                 </svg>
+                <input
+                  name="search"
+                  type="text"
+                  class="grow"
+                  placeholder="Search"
+                  hx-get="/users"
+                  hx-trigger="keyup delay:400ms changed"
+                  hx-target="#user-list"
+                  id="search-input"
+                />
+                <kbd class="kbd kbd-sm">⌘</kbd>
+                <kbd class="kbd kbd-sm">K</kbd>
               </label>
             </div>
             <div class="w-full mt-5">
-              <ul id="user-list" class="min-h-[100px] max-h-[300px]">
+              <ul
+                id="user-list"
+                class="min-h-[300px] max-h-[300px] overflow-scroll"
+              >
                 {{template "user-list" .}}
               </ul>
             </div>
           </div>
         </div>
-        <label class="modal-backdrop" for="new_chat_modal">Close</label>
+        <form method="dialog" class="modal-backdrop">
+          <button
+            hx-on:click="
+            document.querySelector('#user-list').innerHTML = '';
+            document.querySelector('#search-input').value = '';"
+          >
+            close
+          </button>
+        </form>
       </dialog>
     </div>
   </body>

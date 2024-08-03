@@ -9,7 +9,11 @@
   hx-swap="innerHTML"
 >
   {{if .Avatar}}
-  <img src="{{.Avatar}}" alt="avatar" class="object-cover rounded-full w-10" />
+  <div class="avatar placeholder">
+    <div class="bg-neutral text-neutral-content w-10 rounded-full">
+      <img src="{{.Avatar}}" alt="avatar" />
+    </div>
+  </div>
   {{else}}
   <div class="avatar placeholder">
     <div class="bg-neutral text-neutral-content w-10 rounded-full">

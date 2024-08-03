@@ -33,7 +33,7 @@ function toogleDropdown() {
 function prependNewRoom() {
   // @ts-ignore
   document.querySelector(".modal-backdrop")?.click();
-  const listRoom = document.querySelector(".list-room");
+  const listRoom = document.querySelector("#rooms");
   const room = document.querySelector(".room_id_header");
   const roomId = room?.id;
   const roomName = room?.innerHTML;
