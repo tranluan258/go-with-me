@@ -156,7 +156,7 @@
   hx-get="rooms/dm-room?user_id={{.ID}}"
   hx-target="#chat-container"
   hx-swap="innerHTML"
-  hx-on::after-request="prependNewRoom()"
+  hx-on::after-request="closeModal()"
 >
   {{if .Avatar}}
   <img

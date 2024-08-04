@@ -108,8 +108,7 @@ func timeAgo(t time.Time) string {
 	duration := time.Since(t)
 	switch {
 	case duration.Hours() >= 24:
-		days := int(duration.Hours() / 24)
-		return fmt.Sprintf("%d days ago", days)
+		return t.Format("01-02-2006 3:4 PM")
 	case duration.Hours() >= 1:
 		hours := int(duration.Hours())
 		return fmt.Sprintf("%d hours ago", hours)
