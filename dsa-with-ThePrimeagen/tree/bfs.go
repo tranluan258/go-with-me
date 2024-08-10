@@ -6,17 +6,14 @@ func BFS(head *BinaryNode, needle int) bool {
 			value: head,
 			next:  nil,
 		},
-		tail: &QNode{
-			value: head,
-			next:  nil,
-		},
+		tail:   nil,
 		length: 1,
 	}
 
 	for q.length > 0 {
 		curr := q.Dequeue()
 		if curr == nil {
-			continue
+			return false
 		}
 
 		if curr.val == needle {
@@ -24,11 +21,11 @@ func BFS(head *BinaryNode, needle int) bool {
 		}
 
 		if curr.left != nil {
-			q.Enqueue(head.left)
+			q.Enqueue(curr.left)
 		}
 
 		if curr.right != nil {
-			q.Enqueue(head.right)
+			q.Enqueue(curr.right)
 		}
 	}
 
