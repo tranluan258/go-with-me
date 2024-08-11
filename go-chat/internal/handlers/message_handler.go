@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type MessageHandler struct {
@@ -24,7 +24,7 @@ func (mh *MessageHandler) GetMessagesByRoom(ctx echo.Context) error {
 		return ctx.String(http.StatusBadRequest, "roomId should not be empty")
 	}
 
-	cookie, _ := ctx.Cookie("user_id")
+	userId := ctx.Get("user_id")
 
 	var messages []models.Message
 
@@ -56,11 +56,11 @@ func (mh *MessageHandler) GetMessagesByRoom(ctx echo.Context) error {
           r.room_type IN ('dm', 'group')
       AND 
           r.id=$2;
-      `, cookie.Value, roomId)
+      `, userId, roomId)
 	ctx.Response().Header().Set("Vary", "HX-Request")
 	return ctx.Render(http.StatusOK, "messages", map[string]interface{}{
 		"Messages": messages,
-		"UserId":   cookie.Value,
+		"UserId":   userId,
 		"Room":     room,
 	})
 }

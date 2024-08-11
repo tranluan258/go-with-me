@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type searhQuery struct {
@@ -23,7 +23,8 @@ func NewUserHandler(db *sqlx.DB) *UserHandler {
 }
 
 func (uh *UserHandler) SearchUser(ctx echo.Context) error {
-	cookie, _ := ctx.Cookie("user_id")
+	userId := ctx.Get("user_id")
+
 	var searhQuery searhQuery
 
 	err := ctx.Bind(&searhQuery)
@@ -33,7 +34,7 @@ func (uh *UserHandler) SearchUser(ctx echo.Context) error {
 
 	var users []models.User
 
-	err = uh.db.Select(&users, "SELECT id, full_name,avatar FROM users WHERE id!=$1 AND full_name LIKE $2", cookie.Value, "%"+searhQuery.Search+"%")
+	err = uh.db.Select(&users, "SELECT id, full_name,avatar FROM users WHERE id!=$1 AND full_name LIKE $2", userId, "%"+searhQuery.Search+"%")
 	if err != nil {
 		return ctx.String(http.StatusInternalServerError, "server error")
 	}

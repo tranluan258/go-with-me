@@ -1,20 +1,22 @@
 package server
 
 import (
-	"fmt"
 	"go-chat/internal/config"
 	"go-chat/internal/db"
 	"go-chat/internal/handlers"
+	"go-chat/internal/helpers"
 	"go-chat/internal/ws"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"text/template"
-	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
 )
 
 type Template struct {
@@ -34,12 +36,13 @@ func Init() {
 	db := db.InitDb()
 	bucket := config.FirebaseConfig()
 	t := &Template{
-		templates: template.Must(template.New("base").Funcs(template.FuncMap{"timeAgo": timeAgo}).ParseGlob("views/*.html")),
+		templates: template.Must(template.New("base").Funcs(template.FuncMap{"timeAgo": helpers.TimeAgo}).ParseGlob("views/*.html")),
 	}
 
 	e := echo.New()
 
 	e.Static("/", "views")
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("SESSION_SECRET")))))
 	e.Renderer = t
 
 	// NOTE init route
@@ -102,21 +105,4 @@ func initUserRoute(e *echo.Echo, db *sqlx.DB) {
 	userHandler := handlers.NewUserHandler(db)
 
 	e.GET("/users", MustAuth(userHandler.SearchUser))
-}
-
-func timeAgo(t time.Time) string {
-	duration := time.Since(t)
-	switch {
-	case duration.Hours() >= 24:
-		return t.Format("01-02-2006 3:4 PM")
-	case duration.Hours() >= 1:
-		hours := int(duration.Hours())
-		return fmt.Sprintf("%d hours ago", hours)
-	case duration.Minutes() >= 1:
-		minutes := int(duration.Minutes())
-		return fmt.Sprintf("%d minutes ago", minutes)
-	default:
-		seconds := int(duration.Seconds())
-		return fmt.Sprintf("%d seconds ago", seconds)
-	}
 }

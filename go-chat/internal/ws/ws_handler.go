@@ -6,7 +6,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 const (
@@ -27,8 +27,8 @@ func NewWsHandler() *WsHandler {
 }
 
 func (ws *WsHandler) Serve(c echo.Context, conn *sqlx.DB) error {
-	fullName, _ := c.Cookie("full_name")
-	clientId, _ := c.Cookie("user_id")
+	fullName := c.Get("full_name")
+	userId := c.Get("user_id")
 	socket, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return err
@@ -56,8 +56,8 @@ func (ws *WsHandler) Serve(c echo.Context, conn *sqlx.DB) error {
 	}
 
 	client := &client{
-		clientId: clientId.Value,
-		fullName: fullName.Value,
+		clientId: userId.(string),
+		fullName: fullName.(string),
 		socket:   socket,
 		send:     make(chan []byte),
 		room:     room,

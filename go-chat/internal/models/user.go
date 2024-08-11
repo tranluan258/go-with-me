@@ -1,14 +1,14 @@
 package models
 
 type Login struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
 }
 
 type Register struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	FullName string `json:"fullname"`
+	Username string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
+	FullName string `json:"full_name" form:"full_name"`
 }
 
 type User struct {

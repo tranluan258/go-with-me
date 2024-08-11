@@ -11,8 +11,10 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
 	"github.com/markbates/goth/gothic"
 )
 
@@ -55,8 +57,8 @@ func (ah *AuthHander) LoginPost(ctx echo.Context) error {
 }
 
 func (ah *AuthHander) LoginGet(ctx echo.Context) error {
-	_, err := ctx.Cookie("user_id")
-	if err == nil {
+	userId := ctx.Get("user_id")
+	if _, ok := userId.(string); ok {
 		return ctx.Redirect(http.StatusSeeOther, "/")
 	}
 	return ctx.Render(200, "login.html", map[string]interface{}{
@@ -130,7 +132,7 @@ func (ah *AuthHander) RegisterPost(ctx echo.Context) error {
 	var avatar *string = nil
 	username := ctx.FormValue("username")
 	password := ctx.FormValue("password")
-	fullname := ctx.FormValue("fullname")
+	fullname := ctx.FormValue("full_name")
 
 	file, err := ctx.FormFile("avatar")
 	if err == nil {
@@ -188,22 +190,14 @@ func (ah *AuthHander) RegisterPost(ctx echo.Context) error {
 	return ctx.String(http.StatusFound, "register success")
 }
 
-func (ah *AuthHander) SetCookie(ctx echo.Context, fullName, userId string) {
-	usernameCookie := new(http.Cookie)
-	usernameCookie.Name = "full_name"
-	usernameCookie.Value = fullName
-	usernameCookie.Expires = time.Now().Add(24 * time.Hour)
-	usernameCookie.HttpOnly = true
-	usernameCookie.SameSite = http.SameSiteLaxMode
-	usernameCookie.Path = "/"
-	ctx.SetCookie(usernameCookie)
-
-	cookie := new(http.Cookie)
-	cookie.Name = "user_id"
-	cookie.Value = userId
-	cookie.Expires = time.Now().Add(24 * time.Hour)
-	cookie.HttpOnly = true
-	cookie.Path = "/"
-	cookie.SameSite = http.SameSiteLaxMode
-	ctx.SetCookie(cookie)
+func (ah *AuthHander) SetCookie(c echo.Context, fullName, userId string) {
+	sess, _ := session.Get("session_id", c)
+	sess.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   86400 * 7,
+		HttpOnly: true,
+	}
+	sess.Values["full_name"] = fullName
+	sess.Values["user_id"] = userId
+	sess.Save(c.Request(), c.Response())
 }

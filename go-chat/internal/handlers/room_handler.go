@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type RoomHandler struct {
@@ -28,8 +28,9 @@ func (rh *RoomHandler) CreateRoom(ctx echo.Context) error {
 		return ctx.String(http.StatusBadRequest, "invalid body")
 	}
 
-	cookie, _ := ctx.Cookie("user_id")
-	createRoom.UserIds = append(createRoom.UserIds, cookie.Value)
+	userId := ctx.Get("user_id")
+
+	createRoom.UserIds = append(createRoom.UserIds, userId.(string))
 
 	tx := rh.db.MustBegin()
 
@@ -53,7 +54,7 @@ func (rh *RoomHandler) CreateRoom(ctx echo.Context) error {
 
 func (rh *RoomHandler) GetRoomById(ctx echo.Context) error {
 	roomId := ctx.Param("room_id")
-	cookie, _ := ctx.Cookie("user_id")
+	userId := ctx.Get("user_id")
 
 	var messages []models.Message
 
@@ -63,7 +64,7 @@ func (rh *RoomHandler) GetRoomById(ctx echo.Context) error {
 	}
 	return ctx.Render(http.StatusOK, "messages", map[string]interface{}{
 		"Messages": messages,
-		"UserId":   cookie.Value,
+		"UserId":   userId,
 	})
 }
 
@@ -74,7 +75,7 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
 	if user2Id == "" {
 		return ctx.String(http.StatusBadRequest, "user2Id should not be empty")
 	}
-	cookie, _ := ctx.Cookie("user_id")
+	userId := ctx.Get("user_id")
 
 	var existedRoom models.Room
 
@@ -86,7 +87,7 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
      WHERE ru1.user_id = $1
      AND ru2.user_id = $2
      AND r.room_type = 'dm'
-     GROUP BY ru1.room_id,r.name`, user2Id, cookie.Value)
+     GROUP BY ru1.room_id,r.name`, user2Id, userId)
 	if err != nil {
 		tx := rh.db.MustBegin()
 
@@ -97,7 +98,7 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
 			return ctx.String(http.StatusInternalServerError, "server error")
 		}
 
-		tx.MustExec("INSERT INTO user_room (user_id, room_id) VALUES($1, $2)", cookie.Value, roomId)
+		tx.MustExec("INSERT INTO user_room (user_id, room_id) VALUES($1, $2)", userId, roomId)
 		tx.MustExec("INSERT INTO user_room (user_id, room_id) VALUES($1, $2)", user2Id, roomId)
 		tx.Commit()
 
@@ -120,11 +121,11 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
           user_room ru1 ON r.id = ru1.room_id
       AND 
           r.id=$2;
-      `, cookie.Value, roomId)
+      `, userId, roomId)
 
 		return ctx.Render(http.StatusOK, "messages", map[string]interface{}{
 			"Messages": []models.Message{},
-			"UserId":   cookie.Value,
+			"UserId":   userId,
 			"Room":     room,
 		})
 	}
@@ -138,7 +139,7 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
 
 	return ctx.Render(http.StatusOK, "messages", map[string]interface{}{
 		"Messages": messages,
-		"UserId":   cookie.Value,
+		"UserId":   userId,
 		"Room":     existedRoom,
 	})
 }

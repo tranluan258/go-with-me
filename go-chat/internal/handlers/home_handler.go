@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type HomeHandler struct {
@@ -20,11 +20,12 @@ func NewHomeHandler(db *sqlx.DB) *HomeHandler {
 }
 
 func (hh *HomeHandler) GetHomeTemplate(ctx echo.Context) error {
-	cookie, _ := ctx.Cookie("user_id")
+	userId := ctx.Get("user_id")
+
 	var user models.User
 	var rooms []models.Room
 
-	err := hh.db.Get(&user, "SELECT id,username,full_name,avatar FROM users WHERE id=$1", cookie.Value)
+	err := hh.db.Get(&user, "SELECT id,username,full_name,avatar FROM users WHERE id=$1", userId)
 	if err != nil {
 		return ctx.String(http.StatusInternalServerError, "server error")
 	}
@@ -49,7 +50,7 @@ WHERE
     ru1.user_id = $1
 AND 
     r.room_type IN ('dm', 'group');
-    `, cookie.Value)
+    `, userId)
 	if err != nil {
 		log.Println(err.Error())
 		return ctx.String(http.StatusInternalServerError, "server error")
