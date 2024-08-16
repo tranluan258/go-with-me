@@ -11,14 +11,16 @@ func TestBst(t *testing.T) {
 	tree.insert(2)
 	tree.insert(1)
 	tree.insert(3)
-	if tree.tree.val != 2 {
-		t.Fatalf("expected %d rec %d", 2, tree.tree.val)
-	}
+	tree.insert(5)
+	tree.insert(4)
 
-	if tree.tree.right.val != 3 {
-		t.Fatalf("expected %d rec %d", 3, tree.tree.right.val)
+	if !tree.find(3) {
+		t.Fatalf("expected %t rec %t", true, false)
 	}
-	if tree.tree.left.val != 1 {
-		t.Fatalf("expected %d rec %d", 1, tree.tree.left.val)
+	if !tree.find(5) {
+		t.Fatalf("expected %t rec %t", true, false)
+	}
+	if tree.find(6) {
+		t.Fatalf("expected %t rec %t", false, true)
 	}
 }
