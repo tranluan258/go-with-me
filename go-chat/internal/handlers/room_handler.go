@@ -80,7 +80,7 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
 	var existedRoom models.Room
 
 	err := rh.db.Get(&existedRoom,
-		`SELECT ru1.room_id AS id, 
+		`SELECT ru1.room_id AS id,
     r.name as name FROM user_room ru1
      JOIN user_room ru2 ON ru1.room_id = ru2.room_id
      JOIN rooms r ON ru1.room_id = r.id
@@ -104,24 +104,23 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
 
 		var room models.Room
 		rh.db.Get(&room, `
-      SELECT 
-          r.id AS id,
-          CASE
-              WHEN r.room_type = 'dm' THEN (SELECT u.full_name FROM users u JOIN user_room ru ON u.id = ru.user_id WHERE ru.room_id = r.id AND u.id != $1)
-              ELSE r.name
-              END AS name,
-          CASE
-              WHEN r.room_type = 'dm' THEN (SELECT u.avatar FROM users u JOIN user_room ru ON u.id = ru.user_id WHERE ru.room_id = r.id AND u.id != $1)
-              ELSE NULL
-              END AS avatar,
-          r.room_type
-      FROM 
-          rooms r
-      JOIN 
-          user_room ru1 ON r.id = ru1.room_id
-      AND 
-          r.id=$2;
-      `, userId, roomId)
+      		SELECT
+      		    r.id AS id,
+      		    CASE
+      		        WHEN r.room_type = 'dm' THEN (SELECT u.full_name FROM users u JOIN user_room ru ON u.id = ru.user_id WHERE ru.room_id = r.id AND u.id != $1)
+      		        ELSE r.name
+      		    END AS name,
+      		    CASE
+      		        WHEN r.room_type = 'dm' THEN (SELECT u.avatar FROM users u JOIN user_room ru ON u.id = ru.user_id WHERE ru.room_id = r.id AND u.id != $1)
+      		        ELSE NULL
+      		    END AS avatar,
+      		    r.room_type
+      		FROM
+      		    rooms r
+      		JOIN
+      		    user_room ru1 ON r.id = ru1.room_id
+      		AND r.id=$2; `,
+			userId, roomId)
 
 		return ctx.Render(http.StatusOK, "messages", map[string]interface{}{
 			"Messages": []models.Message{},

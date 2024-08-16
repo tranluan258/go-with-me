@@ -37,14 +37,17 @@ func (mh *MessageHandler) GetMessagesByRoom(ctx echo.Context) error {
 	mh.db.Get(&room, `
       SELECT 
           r.id AS id,
+
           CASE
               WHEN r.room_type = 'dm' THEN (SELECT u.full_name FROM users u JOIN user_room ru ON u.id = ru.user_id WHERE ru.room_id = r.id AND u.id != $1)
               ELSE r.name
-              END AS name,
+          END AS name,
+
           CASE
               WHEN r.room_type = 'dm' THEN (SELECT u.avatar FROM users u JOIN user_room ru ON u.id = ru.user_id WHERE ru.room_id = r.id AND u.id != $1)
               ELSE NULL
-              END AS avatar,
+          END AS avatar,
+
           r.room_type
       FROM 
           rooms r
