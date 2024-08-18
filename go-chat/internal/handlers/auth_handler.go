@@ -51,7 +51,7 @@ func (ah *AuthHander) LoginPost(ctx echo.Context) error {
 			"Errors": "Invalid credentials",
 		})
 	}
-	ah.SetCookie(ctx, user.FullName, user.ID)
+	ah.CreateSession(ctx, user.FullName, user.ID)
 	ctx.Response().Header().Add("HX-Redirect", "/")
 	return ctx.String(http.StatusFound, "login success")
 }
@@ -116,11 +116,11 @@ func (ah *AuthHander) CompleteAuth(ctx echo.Context) error {
 		newUser := models.User{}
 		ah.db.Get(&newUser, "SELECT id,username,password,full_name,avatar FROM users WHERE username=$1", oauhtUser.UserID)
 
-		ah.SetCookie(ctx, newUser.FullName, newUser.ID)
+		ah.CreateSession(ctx, newUser.FullName, newUser.ID)
 		return ctx.Redirect(http.StatusTemporaryRedirect, "/")
 	}
 
-	ah.SetCookie(ctx, existedUser.FullName, existedUser.ID)
+	ah.CreateSession(ctx, existedUser.FullName, existedUser.ID)
 	return ctx.Redirect(http.StatusTemporaryRedirect, "/")
 }
 
@@ -134,6 +134,14 @@ func (ah *AuthHander) RegisterPost(ctx echo.Context) error {
 	password := ctx.FormValue("password")
 	fullname := ctx.FormValue("full_name")
 
+	var usernameExisted string
+	empty := ah.db.Get(&usernameExisted, "SELECT username FROM users WHERE username=$1", username)
+	if empty == nil {
+		return ctx.Render(http.StatusBadRequest, "errors", map[string]interface{}{
+			"Errors": "User already existed",
+		})
+	}
+
 	file, err := ctx.FormFile("avatar")
 	if err == nil {
 		func() {
@@ -144,7 +152,6 @@ func (ah *AuthHander) RegisterPost(ctx echo.Context) error {
 			}
 			defer src.Close()
 
-			// Destination
 			t := time.Now()
 
 			docName := t.Format("20060102150405") + file.Filename
@@ -170,17 +177,9 @@ func (ah *AuthHander) RegisterPost(ctx echo.Context) error {
 		}()
 	}
 
-	var usernameExisted string
-	empty := ah.db.Get(&usernameExisted, "SELECT username FROM users WHERE username=$1", username)
-	if empty == nil {
-		return ctx.Render(http.StatusBadRequest, "errors", map[string]interface{}{
-			"Errors": "User already existed",
-		})
-	}
-
 	_, err = ah.db.Exec("INSERT INTO users(username,password,full_name,avatar) VALUES($1,$2,$3, $4)", username, password, fullname, avatar)
 	if err != nil {
-		slog.Error("Insert failed", "error", err.Error())
+		slog.Error("Insert user failed", "error", err.Error())
 		return ctx.Render(http.StatusBadRequest, "errors", map[string]interface{}{
 			"Errors": "Register failed",
 		})
@@ -190,7 +189,7 @@ func (ah *AuthHander) RegisterPost(ctx echo.Context) error {
 	return ctx.String(http.StatusFound, "register success")
 }
 
-func (ah *AuthHander) SetCookie(c echo.Context, fullName, userId string) {
+func (ah *AuthHander) CreateSession(c echo.Context, fullName, userId string) {
 	sess, _ := session.Get("session_id", c)
 	sess.Options = &sessions.Options{
 		Path:     "/",

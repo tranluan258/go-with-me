@@ -7,7 +7,7 @@ import (
 	"go-chat/internal/helpers"
 	"go-chat/internal/ws"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"text/template"
@@ -26,7 +26,7 @@ type Template struct {
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	err := t.templates.ExecuteTemplate(w, name, data)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error("error render html: ", "err", err.Error())
 		return err
 	}
 	return nil
@@ -42,10 +42,9 @@ func Init() {
 	e := echo.New()
 
 	e.Static("/", "views")
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("SESSION_SECRET")))))
 	e.Renderer = t
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("SESSION_SECRET")))))
 
-	// NOTE init route
 	intWsRoute(e, db)
 	initHomeRoute(e, db)
 	initAuthRoute(e, db, bucket)
@@ -91,8 +90,6 @@ func initRoomRoute(e *echo.Echo, db *sqlx.DB) {
 
 	e.POST("/rooms", MustAuth(roomHandler.CreateRoom))
 	e.GET("/rooms/dm-room", MustAuth(roomHandler.GetDMRoom))
-	// TODO: this api this return detail room
-	// e.GET("/rooms/:room_id", MustAuth(roomHandler.GetRoomById))
 }
 
 func initMessageRoute(e *echo.Echo, db *sqlx.DB) {

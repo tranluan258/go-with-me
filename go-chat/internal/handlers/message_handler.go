@@ -19,21 +19,20 @@ func NewMessageHandler(db *sqlx.DB) *MessageHandler {
 }
 
 func (mh *MessageHandler) GetMessagesByRoom(ctx echo.Context) error {
+	var room models.Room
+	var messages []models.Message
 	roomId := ctx.QueryParam("room_id")
+	userId := ctx.Get("user_id")
+
 	if roomId == "" {
 		return ctx.String(http.StatusBadRequest, "roomId should not be empty")
 	}
-
-	userId := ctx.Get("user_id")
-
-	var messages []models.Message
 
 	err := mh.db.Select(&messages, "SELECT id,message,sender_id,full_name,created_time FROM messages WHERE room_id=$1 ORDER BY created_time ASC", roomId)
 	if err != nil {
 		return err
 	}
 
-	var room models.Room
 	mh.db.Get(&room, `
       SELECT 
           r.id AS id,
