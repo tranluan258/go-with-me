@@ -1,5 +1,7 @@
 package heap
 
+import "fmt"
+
 type MinHeap struct {
 	data   []int
 	length int
@@ -7,6 +9,7 @@ type MinHeap struct {
 
 func (h *MinHeap) insert(val int) {
 	h.data[h.length] = val
+	h.heapifyUp(h.length)
 	h.length++
 }
 
@@ -51,9 +54,11 @@ func (h *MinHeap) heapifyUp(idx int) {
 	pV := h.data[pIdx]
 	v := h.data[idx]
 
+	fmt.Println("up", idx)
+
 	if v < pV {
-		h.data[v] = pV
-		h.data[pV] = v
+		h.data[idx] = pV
+		h.data[pIdx] = v
 		h.heapifyUp(pIdx)
 	}
 }
