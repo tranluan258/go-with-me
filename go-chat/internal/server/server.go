@@ -17,6 +17,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/markbates/goth/gothic"
 )
 
 type Template struct {
@@ -43,7 +44,11 @@ func Init() {
 
 	e.Static("/", "views")
 	e.Renderer = t
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("SESSION_SECRET")))))
+
+	store := sessions.NewCookieStore([]byte(os.Getenv("SESSION_SECRET")))
+	gothic.Store = store
+
+	e.Use(session.Middleware(store))
 
 	intWsRoute(e, db)
 	initHomeRoute(e, db)

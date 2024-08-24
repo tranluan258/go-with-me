@@ -12,14 +12,12 @@
         <div class="profile-section w-16">
           <div class="profile-icon" id="profileIcon">
             {{if .Avatar}}
-            <div class="dropdown dropdown-end w-16 pr-4 mr-3">
-              <img
-                tabindex="0"
-                role="button"
-                class="rounded-full w-24"
-                src="{{.Avatar}}"
-                alt="avatar "
-              />
+            <div class="dropdown dropdown-end">
+              <div class="avatar online" tabindex="0" role="button">
+                <div class="w-10 rounded-full">
+                  <img src="{{.Avatar}}" />
+                </div>
+              </div>
               <ul
                 tabindex="0"
                 class="dropdown-content text-black menu rounded-box z-[100] w-fit p-2"
@@ -36,7 +34,7 @@
               </div>
               <ul
                 tabindex="0"
-                class="dropdown-content menu rounded-box text-black z-[1] w-fit p-2"
+                class="dropdown-content menu rounded-box text-black z-[100] w-fit p-2"
               >
                 <li><a href="/logout">Logout</a></li>
               </ul>
@@ -97,7 +95,9 @@
         <div class="modal-box bg-white">
           <div class="w-full flex flex-col">
             <div class="w-full">
-              <label class="input input-bordered flex items-center gap-2">
+              <label
+                class="input input-bordered flex items-center gap-2 bg-white"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 16 16"
@@ -120,8 +120,6 @@
                   hx-target="#user-list"
                   id="search-input"
                 />
-                <kbd class="kbd kbd-sm">⌘</kbd>
-                <kbd class="kbd kbd-sm">K</kbd>
               </label>
             </div>
             <div class="w-full mt-5">
