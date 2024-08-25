@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"go-chat/internal/models"
+	"log/slog"
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
@@ -30,7 +31,10 @@ func (mh *MessageHandler) GetMessagesByRoom(ctx echo.Context) error {
 
 	err := mh.db.Select(&messages, "SELECT id,message,sender_id,full_name,created_time FROM messages WHERE room_id=$1 ORDER BY created_time ASC", roomId)
 	if err != nil {
-		return err
+		slog.Error("Error select message per roomId", "error", err.Error())
+		return ctx.Render(http.StatusNotFound, "errors", map[string]interface{}{
+			"Errors": "Not found messages",
+		})
 	}
 
 	mh.db.Get(&room, `

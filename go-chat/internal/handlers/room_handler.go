@@ -104,7 +104,10 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
 		err = tx.Get(&roomId, "INSERT INTO rooms (name,room_type) VALUES($1,$2) RETURNING id", "Test", "dm")
 		if err != nil {
 			tx.Rollback()
-			return ctx.String(http.StatusInternalServerError, "server error")
+			slog.Error("Error insert new room", "error", err.Error())
+			return ctx.Render(http.StatusNotFound, "errors", map[string]interface{}{
+				"Errors": "Something wrong try again",
+			})
 		}
 
 		tx.MustExec("INSERT INTO user_room (user_id, room_id) VALUES($1, $2)", userId, roomId)
@@ -140,7 +143,10 @@ func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
 
 	err = rh.db.Select(&messages, "SELECT id,message,sender_id,full_name,created_time FROM messages WHERE room_id=$1 ORDER BY created_time ASC", existedRoom.ID)
 	if err != nil {
-		return err
+		slog.Error("Error select message per roomId", "error", err.Error())
+		return ctx.Render(http.StatusNotFound, "errors", map[string]interface{}{
+			"Errors": "Not found messages",
+		})
 	}
 	rh.db.Get(&existedRoom, "SELECT full_name as name,avatar FROM users WHERE id=$1", user2Id)
 

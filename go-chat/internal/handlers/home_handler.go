@@ -25,12 +25,9 @@ func (hh *HomeHandler) GetHomeTemplate(ctx echo.Context) error {
 	var user models.User
 	var rooms []models.Room
 
-	err := hh.db.Get(&user, "SELECT id,username,full_name,avatar FROM users WHERE id=$1", userId)
-	if err != nil {
-		return ctx.String(http.StatusNotFound, "not found user")
-	}
+	hh.db.Get(&user, "SELECT id,username,full_name,avatar FROM users WHERE id=$1", userId)
 
-	err = hh.db.Select(&rooms, `
+	err := hh.db.Select(&rooms, `
       SELECT 
           r.id AS id,
           CASE
@@ -52,8 +49,10 @@ func (hh *HomeHandler) GetHomeTemplate(ctx echo.Context) error {
           r.room_type IN ('dm', 'group');`,
 		userId)
 	if err != nil {
-		slog.Error("Error not found room", "error", err.Error())
-		return ctx.String(http.StatusInternalServerError, "server error")
+		slog.Error("Error select list room of user", "error", err.Error())
+		return ctx.Render(http.StatusBadRequest, "errors", map[string]interface{}{
+			"Errors": "Something wrong try again",
+		})
 	}
 
 	return ctx.Render(http.StatusOK, "home.html", map[string]interface{}{

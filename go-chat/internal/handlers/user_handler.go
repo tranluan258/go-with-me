@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"go-chat/internal/models"
+	"log/slog"
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
@@ -29,14 +30,20 @@ func (uh *UserHandler) SearchUser(ctx echo.Context) error {
 
 	err := ctx.Bind(&searhQuery)
 	if err != nil {
-		return ctx.String(http.StatusBadRequest, "bad request")
+		slog.Warn("Missing field", "error", err.Error())
+		return ctx.Render(http.StatusBadRequest, "errors", map[string]interface{}{
+			"Errors": "Missing field",
+		})
 	}
 
 	var users []models.User
 
 	err = uh.db.Select(&users, "SELECT id, full_name,avatar FROM users WHERE id!=$1 AND full_name LIKE $2", userId, "%"+searhQuery.Search+"%")
 	if err != nil {
-		return ctx.String(http.StatusInternalServerError, "server error")
+		slog.Warn("Error search users", "error", err.Error())
+		return ctx.Render(http.StatusBadRequest, "errors", map[string]interface{}{
+			"Errors": "Something wrong try again",
+		})
 	}
 
 	return ctx.Render(http.StatusOK, "user-list", map[string]interface{}{
