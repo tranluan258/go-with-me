@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"go-chat/internal/config"
 	"go-chat/internal/db"
 	"go-chat/internal/handlers"
@@ -20,6 +21,21 @@ import (
 	"github.com/markbates/goth/gothic"
 )
 
+func argsfn(kvs ...interface{}) (map[string]interface{}, error) {
+	if len(kvs)%2 != 0 {
+		return nil, errors.New("args requires even number of arguments.")
+	}
+	m := make(map[string]interface{})
+	for i := 0; i < len(kvs); i += 2 {
+		s, ok := kvs[i].(string)
+		if !ok {
+			return nil, errors.New("even args to args must be strings.")
+		}
+		m[s] = kvs[i+1]
+	}
+	return m, nil
+}
+
 type Template struct {
 	templates *template.Template
 }
@@ -37,7 +53,7 @@ func Init() {
 	db := db.InitDb()
 	bucket := config.FirebaseConfig()
 	t := &Template{
-		templates: template.Must(template.New("base").Funcs(template.FuncMap{"timeAgo": helpers.TimeAgo}).ParseGlob("views/*.html")),
+		templates: template.Must(template.New("base").Funcs(template.FuncMap{"timeAgo": helpers.TimeAgo, "args": argsfn}).ParseGlob("views/*.html")),
 	}
 
 	e := echo.New()

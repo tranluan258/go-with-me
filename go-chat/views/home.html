@@ -47,12 +47,23 @@
         <div class="w-1/5 p-5 border border-gray-100" id="rooms">
           <div class="flex justify-between items-center">
             <h3 class="font-bold text-lg mb-2">Recent Chats</h3>
-            <button
-              class="btn btn-sm btn-primary"
-              onclick="new_chat_modal.showModal()"
-            >
-              New chat
-            </button>
+            <details class="dropdown">
+              <summary class="btn btn-sm btn-primary m-1">New Chat</summary>
+              <ul
+                class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+              >
+                <li>
+                  <a onclick="new_direct_messagse_modal.showModal()"
+                    >New Direct Message</a
+                  >
+                </li>
+                <li>
+                  <a onclick="new_group_messagse_modal.showModal()"
+                    >New Group</a
+                  >
+                </li>
+              </ul>
+            </details>
           </div>
           <ul class="list-none" id="rooms">
             {{template "rooms" .}}
@@ -91,7 +102,7 @@
         </div>
       </div>
       <div id="toastContainer"></div>
-      <dialog id="new_chat_modal" class="modal">
+      <dialog id="new_direct_messagse_modal" class="modal">
         <div class="modal-box bg-white">
           <div class="w-full flex flex-col">
             <div class="w-full">
@@ -142,6 +153,64 @@
           </button>
         </form>
       </dialog>
+
+      <dialog id="new_group_messagse_modal" class="modal">
+        <div class="modal-box bg-white">
+          <div class="w-full flex flex-col">
+            <div class="w-full mb-3">
+              <label class="input input-bordered flex items-center gap-2">
+                Group Name
+                <input type="text" class="grow" placeholder="Abc" />
+              </label>
+            </div>
+            <div class="w-full">
+              <label
+                class="input input-bordered flex items-center gap-2 bg-white"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                  class="h-4 w-4 opacity-70"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <input
+                  name="search"
+                  type="text"
+                  class="grow"
+                  placeholder="Search"
+                  hx-get="/users"
+                  hx-trigger="keyup delay:400ms changed"
+                  hx-target="#user-list-group"
+                  id="search-input"
+                />
+              </label>
+            </div>
+            <div class="w-full mt-5">
+              <ul
+                id="user-list-group"
+                class="min-h-[300px] max-h-[300px] overflow-scroll"
+              >
+                {{template "user-list" args "User" .Users "IsGroup" true}}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button
+            hx-on:click="
+            document.querySelector('#user-list').innerHTML = '';
+            document.querySelector('#search-input').value = '';"
+          >
+            close
+          </button>
+        </form>
+      </dialog>
     </div>
     {{template "errors" .}}
   </body>
@@ -151,25 +220,33 @@
 <!-- loop -->
 {{range .Users}}
 <li
-  class="flex items-center w-full h-[70px] mb-2 p-4 rounded-xl cursor-pointer hover:bg-gray-50"
+  class="flex items-center justify-between w-full h-[70px] mb-2 p-4 rounded-xl cursor-pointer hover:bg-gray-50"
   hx-get="rooms/dm-room?user_id={{.ID}}"
   hx-target="#chat-container"
   hx-swap="innerHTML"
   hx-on::after-request="closeModal()"
 >
-  {{if .Avatar}}
-  <img
-    src="{{.Avatar}}"
-    alt="avatar"
-    class="object-cover h-full rounded-full w-10"
-  />
-  {{else}}
-  <div class="avatar placeholder">
-    <div class="bg-neutral text-neutral-content w-10 rounded-full">
-      <span class="text-xs">UNE</span>
+  <div class="flex items-center">
+    {{if .Avatar}}
+    <img
+      src="{{.Avatar}}"
+      alt="avatar"
+      class="object-cover h-full rounded-full w-10"
+    />
+    {{else}}
+    <div class="avatar placeholder">
+      <div class="bg-neutral text-neutral-content w-10 rounded-full">
+        <span class="text-xs">UNE</span>
+      </div>
     </div>
+    {{end}}
+    <span class="ml-3 truncate">{{.FullName}}</span>
   </div>
-  {{end}}
-  <span class="ml-3 truncate">{{.FullName}}</span>
+  <div>
+    <input
+      type="checkbox"
+      class="checkbox [--chkbg:oklch(var(--a))] [--chkfg:oklch(var(--p))]"
+    />
+  </div>
 </li>
 {{end}} {{end}}
