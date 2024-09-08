@@ -70,12 +70,12 @@ func (rh *RoomHandler) GetRoomById(ctx echo.Context) error {
 
 func (rh *RoomHandler) GetDMRoom(ctx echo.Context) error {
 	user2Id := ctx.QueryParam("user_id")
+	userId := ctx.Get("user_id")
 	var messages []models.Message
 
 	if user2Id == "" {
 		return ctx.String(http.StatusBadRequest, "user2Id should not be empty")
 	}
-	userId := ctx.Get("user_id")
 
 	var existedRoom models.Room
 

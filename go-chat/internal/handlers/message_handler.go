@@ -63,6 +63,7 @@ func (mh *MessageHandler) GetMessagesByRoom(ctx echo.Context) error {
       AND 
           r.id=$2;
       `, userId, roomId)
+
 	ctx.Response().Header().Set("Vary", "HX-Request")
 	return ctx.Render(http.StatusOK, "messages", map[string]interface{}{
 		"Messages": messages,

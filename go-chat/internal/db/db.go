@@ -14,8 +14,10 @@ func InitDb() *sqlx.DB {
 	dbPass := os.Getenv("DB_PASSWORD")
 	dbUserName := os.Getenv("DB_USERNAME")
 	dbName := os.Getenv("DB_NAME")
+	dbPort := os.Getenv("DB_PORT")
+	dbHost := os.Getenv("DB_HOST")
 
-	dbUrl := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", dbUserName, dbPass, dbName)
+	dbUrl := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUserName, dbPass, dbName)
 
 	conn, err := sqlx.Connect(driver, dbUrl)
 	if err != nil {
