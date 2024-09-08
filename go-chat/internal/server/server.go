@@ -73,7 +73,7 @@ func Init() {
 	initUserRoute(e, db)
 	initMessageRoute(e, db)
 
-	e.Logger.Fatal(e.Start("localhost:8080"))
+	e.Logger.Fatal(e.Start(":" + "8080"))
 }
 
 func intWsRoute(e *echo.Echo, db *sqlx.DB) {
